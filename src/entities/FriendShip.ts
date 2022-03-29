@@ -29,11 +29,7 @@ class FriendShip extends BaseEntity {
           }
           break;
         case FriendShipStatus.COMPLETE:
-          if (friendShip.sender_id !== curUserId) {
-            validUserIds.push(friendShip.sender_id);
-          } else if (friendShip.receiver_id !== curUserId) {
-            validUserIds.push(friendShip.receiver_id);
-          }
+          validUserIds.push(friendShip.sender_id);
       }
     });
     return validUserIds

@@ -14,6 +14,7 @@ module.exports = {
   rules: {
     "require-jsdoc": 0,
     "new-cap": 0,
+    "no-multiple-empty-lines": 0,
     "no-undef": 0,
     "no-console": 0,
     camelcase: 0,

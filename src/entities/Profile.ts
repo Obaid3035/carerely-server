@@ -10,8 +10,8 @@ import {
 import User from "./User";
 
 export enum GENDER {
-  MALE = "m",
-  FEMALE = "f",
+  MALE = "male",
+  FEMALE = "female",
 }
 
 @Entity(Profile.MODEL_NAME)

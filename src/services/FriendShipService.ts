@@ -3,6 +3,7 @@ import BaseService from "./base.service";
 import FriendShip, { FriendShipStatus } from "../entities/FriendShip";
 import User from "../entities/User";
 import BadRequest, { NotFound } from "../utils/errorCode";
+import { Brackets } from "typeorm";
 
 @Service()
 class FriendShipService extends BaseService<FriendShip> {
@@ -10,10 +11,34 @@ class FriendShipService extends BaseService<FriendShip> {
     super(FriendShip);
   }
 
-  async sendFriendShipRequest(
-    sender: User,
-    receiverId: string
-  ): Promise<{ saved: boolean }> {
+  async getUserFollower(currUserId: number | string) {
+    return await FriendShip.createQueryBuilder("friendShip")
+      .select(["friendShip", "user.user_name"])
+      .where("friendShip.receiver_id = :receiver_id", { receiver_id: currUserId })
+      .innerJoin("friendShip.sender", "user")
+      .getMany();
+  }
+
+  async getUserFollowing(currUserId: number | string) {
+    return await FriendShip.createQueryBuilder("friendShip")
+      .select(["friendShip", "user.user_name"])
+      .where("friendShip.sender_id = :sender_id", { sender_id: currUserId })
+      .innerJoin("friendShip.receiver", "user")
+      .getMany();
+  }
+
+  async unFollowFriendship(friendShipId: string) {
+    const friendShip = await FriendShip.findOne(friendShipId);
+    if (!friendShip) {
+      throw new NotFound("FriendShip not found");
+    }
+    await FriendShip.remove(friendShip);
+    return {
+      deleted: true
+    }
+  }
+
+  async sendFriendShipRequest(sender: User, receiverId: string) {
     console.log("*********** Creating FriendShip *************");
 
     const receiver: User = await User.findOne(receiverId);
@@ -29,13 +54,11 @@ class FriendShipService extends BaseService<FriendShip> {
     console.log("*********** FriendShip Created Successfully *************");
     return {
       saved: true,
+      status: "VIEW",
     };
   }
 
-  async acceptFriendShipRequest(
-    receiver: User,
-    senderId: string
-  ): Promise<{ updated: boolean }> {
+  async acceptFriendShipRequest(receiver: User, senderId: string) {
     const sender: User = await User.findOne(senderId);
     if (!sender) {
       throw new NotFound("User not found");
@@ -48,7 +71,6 @@ class FriendShipService extends BaseService<FriendShip> {
       },
     });
 
-
     if (friendShip.status === FriendShipStatus.COMPLETE) {
       throw new BadRequest("Sorry friendship is already complete");
     }
@@ -57,6 +79,7 @@ class FriendShipService extends BaseService<FriendShip> {
     await friendShip.save();
     return {
       updated: true,
+      status: "VIEW",
     };
   }
 
@@ -80,51 +103,54 @@ class FriendShipService extends BaseService<FriendShip> {
     await FriendShip.delete(friendShip.id);
     return {
       deleted: true,
+      status: "SEND",
     };
   }
 
   async deleteFriendShip(userId_1: string, user_2: User) {
-    console.log("************** Checking if user 1 is the sender and user 2 is receiver *************")
-    const friendShip = await FriendShip.createQueryBuilder("friendship")
-      .where("friendship.sender_id = :sender_id", {
-        sender_id: userId_1
-      })
-      .andWhere("friendship.receiver_id = :receiver_id", {
-        receiver_id: user_2.id,
-      })
-      .andWhere("friendship.status = :status", {
-        status: FriendShipStatus.COMPLETE,
-      })
+    console.log(
+      "************** Checking if user 1 is the sender and user 2 is receiver *************"
+    );
+    const friendShip_1 = await FriendShip.createQueryBuilder("friendship")
+      .where(
+        new Brackets((qb) => {
+          qb.where("friendship.receiver_id = :receiver_id", {
+            receiver_id: userId_1,
+          }).andWhere("friendship.sender_id = :sender_id", {
+            sender_id: user_2.id,
+          });
+        })
+      )
       .getOne();
 
+    const friendShip_2 = await FriendShip.createQueryBuilder("friendship")
+      .where(
+        new Brackets((qb) => {
+          qb.where("friendship.receiver_id = :receiver_id", {
+            receiver_id: user_2.id,
+          }).andWhere("friendship.sender_id = :sender_id", {
+            sender_id: userId_1,
+          });
+        })
+      )
+      .getOne();
 
-    if (!friendShip) {
-      console.log("************** Checking if user 2 is the sender and user 1 is receiver *************")
-      const friendShip_2 = await FriendShip.createQueryBuilder("friendship")
-        .where("friendship.sender_id = :sender_id", {
-          sender_id: user_2.id,
-        })
-        .andWhere("friendship.receiver_id = :receiver_id", {
-          receiver_id: userId_1,
-        })
-        .andWhere("friendship.status = :status", {
-          status: FriendShipStatus.COMPLETE,
-        })
-        .getOne();
-      if (!friendShip_2) {
-        throw new Error("No FriendShip Found");
-      }
-      console.log("************** FriendShip Successfully deleted *************")
-      await FriendShip.delete(friendShip_2.id);
-      return {
-        deleted: true,
-      };
+    console.log(userId_1, user_2.id);
+
+    if (!friendShip_1 && !friendShip_2) {
+      throw new Error("No FriendShip Found");
     }
 
-    await FriendShip.delete(friendShip.id);
-    console.log("************** FriendShip Successfully deleted *************")
+    if (friendShip_1) {
+      await FriendShip.delete(friendShip_1.id);
+    } else {
+      await FriendShip.delete(friendShip_2.id);
+    }
+
+    console.log("************** FriendShip Successfully deleted *************");
     return {
       deleted: true,
+      status: "SEND",
     };
   }
 }
