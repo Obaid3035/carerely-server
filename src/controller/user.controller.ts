@@ -94,7 +94,7 @@ class UserController implements IController {
     try {
       const otherUserId = req.params.id
       const userServiceInstance = Container.get(UserService);
-      const users = await userServiceInstance.getUserStats(otherUserId);
+      const users = await userServiceInstance.getUserStats(parseInt(otherUserId));
       res.status(200).json(users)
     } catch (e) {
       next(e);

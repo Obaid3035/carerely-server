@@ -3,5 +3,5 @@ export declare class RelationIdMetadataToAttributeTransformer {
     protected expressionMap: QueryExpressionMap;
     constructor(expressionMap: QueryExpressionMap);
     transform(): void;
-    private metadataToAttribute(parentAliasName, relationId);
+    private metadataToAttribute;
 }

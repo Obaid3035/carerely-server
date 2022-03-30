@@ -6,8 +6,12 @@ import Comment from "../entities/Comment";
 
 @Service()
 class CommentService {
-  async create(currUser: User, postId: string, userInput: Comment) {
-    const post: Post = await Post.findOne(postId);
+  async create(currUser: User, postId: number, userInput: Comment) {
+    const post: Post = await Post.findOne({
+      where: {
+        id: postId
+      }
+    });
     if (!post) {
       throw new NotFound("User not found");
     }

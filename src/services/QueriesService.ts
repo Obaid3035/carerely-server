@@ -1,15 +1,12 @@
 import { Service } from "typedi";
-import BaseService from "./base.service";
+// import BaseService from "./base.service";
 import Queries from "../entities/Queries";
 import Topic from "../entities/Topic";
 import NotFound from "../utils/errorCode";
 import Answer from "../entities/Answer";
 
 @Service()
-class QueriesService extends BaseService<Queries> {
-  constructor() {
-    super(Queries);
-  }
+class QueriesService {
 
   async indexTopic() {
     const topic = await Topic.createQueryBuilder("topic")
@@ -17,8 +14,12 @@ class QueriesService extends BaseService<Queries> {
     return topic
   }
 
-  async createAnswer(queriesId: string, userId: number, userInput: Answer) {
-    const queries = await Queries.findOne(queriesId);
+  async createAnswer(queriesId: number, userId: number, userInput: Answer) {
+    const queries = await Queries.findOne({
+      where: {
+        id: queriesId
+      }
+    });
     if (!queries) {
       throw new NotFound("Topic not found")
     }
@@ -59,8 +60,12 @@ class QueriesService extends BaseService<Queries> {
     return queries;
   }
 
-  async create(topicId: string, userId: number, userInput: Queries) {
-    const topic = await Topic.findOne(topicId);
+  async create(topicId: number, userId: number, userInput: Queries) {
+    const topic = await Topic.findOne({
+      where: {
+        id: topicId
+      }
+    });
     if (!topic) {
       throw new NotFound("Topic not found")
     }
@@ -87,9 +92,7 @@ class QueriesService extends BaseService<Queries> {
   }
 
   async createTopic(userInput: Topic) {
-    const topic = Topic.create({
-      text: userInput.text
-    })
+    const topic = Topic.create(userInput)
     await topic.save();
     return {
       saved: true

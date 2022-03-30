@@ -11,12 +11,12 @@ module.exports = [
     // database: config.orm.database,
     logging: false,
     synchronize: false,
-    entities: [`src/entities/*{.ts,.js}`],
+    entities: [`src/entities/**/*{.ts,.js}`],
     migrations: [
-      "src/config/*{.ts,.js}"
+      "src/migrations/**/*{.ts,.js}"
     ],
     cli: {
-      migrationsDir: "src/config",
+      migrationsDir: "src/migrations",
       entitiesDir: "src/entities",
     },
 

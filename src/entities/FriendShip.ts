@@ -72,15 +72,19 @@ class FriendShip extends BaseEntity {
     const friendship = this;
 
     const found_1 = await FriendShip.findOne({
-      sender: friendship.sender,
-      receiver: friendship.receiver
+      where: {
+        sender_id: friendship.sender.id,
+        receiver_id: friendship.receiver.id
+      }
     })
     if (found_1) {
       throw new BadRequest("Sorry friendship is already exist");
     }
     const found_2 = await FriendShip.findOne({
-      sender: friendship.receiver,
-      receiver: friendship.sender
+      where: {
+        sender_id: friendship.receiver.id,
+        receiver_id: friendship.sender.id
+      }
     })
     if (found_2) {
       throw new BadRequest("Sorry friendship is already exist");

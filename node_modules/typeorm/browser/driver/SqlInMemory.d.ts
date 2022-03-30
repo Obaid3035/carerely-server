@@ -1,7 +1,8 @@
+import { Query } from "./Query";
 /**
  * This class stores up and down queries needed for migrations functionality.
  */
 export declare class SqlInMemory {
-    upQueries: string[];
-    downQueries: string[];
+    upQueries: Query[];
+    downQueries: Query[];
 }

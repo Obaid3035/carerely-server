@@ -41,7 +41,7 @@ class FriendShipController implements IController {
     try {
       const friendShipId = req.params.id
       const friendShipInstance = Container.get(FriendShipService);
-      const { deleted } = await friendShipInstance.unFollowFriendship(friendShipId)
+      const { deleted } = await friendShipInstance.unFollowFriendship(parseInt(friendShipId))
       res.status(200).json({
         deleted
       })
@@ -121,7 +121,7 @@ class FriendShipController implements IController {
       const friendShipInstance = Container.get(FriendShipService);
       const { saved, status } = await friendShipInstance.sendFriendShipRequest(
         sender,
-        receiverId
+        parseInt(receiverId)
       );
       res.status(StatusCodes.CREATED).json({
         saved,
@@ -143,7 +143,7 @@ class FriendShipController implements IController {
       const friendShipInstance = Container.get(FriendShipService);
       const { updated, status } = await friendShipInstance.acceptFriendShipRequest(
         receiver,
-        senderId
+        parseInt(senderId)
       );
       res.status(StatusCodes.OK).json({
         updated,
@@ -165,7 +165,7 @@ class FriendShipController implements IController {
       const friendShipInstance = Container.get(FriendShipService);
       const { deleted, status } = await friendShipInstance.declineFriendShipRequest(
         receiver,
-        senderId
+        parseInt(senderId)
       );
       res.status(200).json({
         deleted,

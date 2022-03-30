@@ -1,15 +1,12 @@
 import { Service } from "typedi";
-import BaseService from "./base.service";
+// import BaseService from "./base.service";
 import FriendShip, { FriendShipStatus } from "../entities/FriendShip";
 import User from "../entities/User";
 import BadRequest, { NotFound } from "../utils/errorCode";
 import { Brackets } from "typeorm";
 
 @Service()
-class FriendShipService extends BaseService<FriendShip> {
-  constructor() {
-    super(FriendShip);
-  }
+class FriendShipService {
 
   async getUserFollower(currUserId: number | string) {
     return await FriendShip.createQueryBuilder("friendShip")
@@ -27,8 +24,12 @@ class FriendShipService extends BaseService<FriendShip> {
       .getMany();
   }
 
-  async unFollowFriendship(friendShipId: string) {
-    const friendShip = await FriendShip.findOne(friendShipId);
+  async unFollowFriendship(friendShipId: number) {
+    const friendShip = await FriendShip.findOne({
+      where: {
+        id: friendShipId
+      }
+    });
     if (!friendShip) {
       throw new NotFound("FriendShip not found");
     }
@@ -38,10 +39,14 @@ class FriendShipService extends BaseService<FriendShip> {
     }
   }
 
-  async sendFriendShipRequest(sender: User, receiverId: string) {
+  async sendFriendShipRequest(sender: User, receiverId: number) {
     console.log("*********** Creating FriendShip *************");
 
-    const receiver: User = await User.findOne(receiverId);
+    const receiver: User = await User.findOne({
+      where: {
+        id: receiverId
+      }
+    });
     if (!receiver) {
       throw new NotFound("User not found");
     }
@@ -58,16 +63,20 @@ class FriendShipService extends BaseService<FriendShip> {
     };
   }
 
-  async acceptFriendShipRequest(receiver: User, senderId: string) {
-    const sender: User = await User.findOne(senderId);
+  async acceptFriendShipRequest(receiver: User, senderId: number) {
+    const sender: User = await User.findOne({
+      where: {
+        id: senderId
+      }
+    });
     if (!sender) {
       throw new NotFound("User not found");
     }
 
     const friendShip = await FriendShip.findOne({
       where: {
-        sender_id: sender,
-        receiver_id: receiver,
+        sender_id: sender.id,
+        receiver_id: receiver.id,
       },
     });
 
@@ -83,16 +92,20 @@ class FriendShipService extends BaseService<FriendShip> {
     };
   }
 
-  async declineFriendShipRequest(receiver: User, senderId: string) {
-    const sender: User = await User.findOne(senderId);
+  async declineFriendShipRequest(receiver: User, senderId: number) {
+    const sender: User = await User.findOne({
+      where: {
+        id: senderId
+      }
+    });
     if (!sender) {
       throw new NotFound("User not found");
     }
 
     const friendShip = await FriendShip.findOne({
       where: {
-        sender_id: sender,
-        receiver_id: receiver,
+        sender_id: sender.id,
+        receiver_id: receiver.id,
       },
     });
 

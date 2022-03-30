@@ -1,4 +1,4 @@
-import BaseService from "./base.service";
+// import BaseService from "./base.service";
 import Post from "../entities/Post";
 import User from "../entities/User";
 import { Service } from "typedi";
@@ -9,10 +9,7 @@ import Like from "../entities/Like";
 import cloudinary from "../utils/cloudinary";
 
 @Service()
-class PostService extends BaseService<Post> {
-  constructor() {
-    super(Post);
-  }
+class PostService {
 
   async index(user: User, skip: number, limit: number): Promise<any> {
     console.log(

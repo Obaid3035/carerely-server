@@ -1,6 +1,7 @@
 import { ColumnMetadata } from "./ColumnMetadata";
 import { EntityMetadata } from "./EntityMetadata";
 import { NamingStrategyInterface } from "../naming-strategy/NamingStrategyInterface";
+import { DeferrableType } from "./types/DeferrableType";
 import { OnDeleteType } from "./types/OnDeleteType";
 import { OnUpdateType } from "./types/OnUpdateType";
 /**
@@ -32,6 +33,10 @@ export declare class ForeignKeyMetadata {
      */
     onUpdate?: OnUpdateType;
     /**
+     * When to check the constraints of a foreign key.
+     */
+    deferrable?: DeferrableType;
+    /**
      * Gets the table name to which this foreign key is referenced.
      */
     referencedTablePath: string;
@@ -55,6 +60,7 @@ export declare class ForeignKeyMetadata {
         referencedColumns: ColumnMetadata[];
         onDelete?: OnDeleteType;
         onUpdate?: OnUpdateType;
+        deferrable?: DeferrableType;
     });
     /**
      * Builds some depend foreign key properties.

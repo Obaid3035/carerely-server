@@ -30,7 +30,7 @@ class Blog extends BaseEntity {
   text: string;
 
   @Column('boolean')
-  is_featured: string;
+  is_featured: boolean;
 
   @ManyToOne(() => User, (user) => user.blog)
   @JoinColumn({

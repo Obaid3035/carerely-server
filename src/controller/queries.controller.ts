@@ -38,7 +38,7 @@ class QueriesController implements IController{
       const queriesId = req.params.id
       const user = (req as IRequest).user;
       const queriesServiceInstance = Container.get(QueriesService);
-      const answer  = await queriesServiceInstance.createAnswer(queriesId, user.id, req.body)
+      const answer  = await queriesServiceInstance.createAnswer(parseInt(queriesId), user.id, req.body)
       res.status(StatusCodes.CREATED).json(answer)
     } catch (e)  {
       next(e);
@@ -84,7 +84,7 @@ class QueriesController implements IController{
       const topicId = req.params.id
       const user = (req as IRequest).user;
       const queriesServiceInstance = Container.get(QueriesService);
-      const topic  = await queriesServiceInstance.create(topicId, user.id, req.body)
+      const topic  = await queriesServiceInstance.create(parseInt(topicId), user.id, req.body)
       res.status(StatusCodes.CREATED).json(topic)
     } catch (e) {
       next(e);

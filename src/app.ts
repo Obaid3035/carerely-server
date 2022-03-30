@@ -3,10 +3,10 @@ import 'reflect-metadata';
 import cors from 'cors';
 import helmet from 'helmet';
 //import rateLimit from 'express-rate-limit';
-import {createConnection} from 'typeorm';
+import AppDataSource from "./config/database";
 import {IController} from './interface';
-import config from './config';
 import handleError from './middleware/errorHandler';
+import config from "./config";
 
 class App {
   public app: Application;
@@ -19,11 +19,24 @@ class App {
   }
 
   public async bootstrap() {
-    const connection = await createConnection(process.env.CONNECTION_NAME);
-    if (connection.isConnected) {
-      await this.app.listen(config.port, () => {
-        console.log('Server is up and running ');
-      });
+    try {
+      // const connection = await createConnection(process.env.CONNECTION_NAME);
+      AppDataSource.initialize()
+        .then(() => {
+          console.log("Data Source has been initialized!")
+          this.app.listen(config.port, () => {
+            console.log('Server is up and running');
+          });
+        })
+        .catch((err) => {
+          console.error("Error during Data Source initialization", err)
+        })
+      // if (connection.isConnected) {
+      //   console.log("Database connection established")
+      //
+      // }
+    } catch (e) {
+      console.log(e);
     }
   }
 

@@ -6,8 +6,12 @@ import { NotFound } from "../utils/errorCode";
 
 @Service()
 class LikeService {
-  async create(currUser: User, postId: string) {
-    const post: Post = await Post.findOne(postId);
+  async create(currUser: User, postId: number) {
+    const post: Post = await Post.findOne({
+      where: {
+        id: postId
+      }
+    });
     if (!post) {
       throw new NotFound("User not found");
     }
@@ -20,7 +24,9 @@ class LikeService {
     });
 
     if (foundLike) {
-      await Like.delete(foundLike);
+      await Like.delete({
+        id: foundLike.id
+      });
       return {
         liked: false,
       };

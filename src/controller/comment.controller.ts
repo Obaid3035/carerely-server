@@ -22,7 +22,7 @@ class CommentController implements IController{
       const postId = req.params.id;
       const user = (req as IRequest).user;
       const commentServiceInstance = Container.get(CommentService);
-      const comment  = await commentServiceInstance.create(user, postId, req.body)
+      const comment  = await commentServiceInstance.create(user, parseInt(postId), req.body)
       res.status(StatusCodes.CREATED).json(comment)
     } catch (e) {
       next(e);

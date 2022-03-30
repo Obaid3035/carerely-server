@@ -29,7 +29,9 @@ class User extends BaseEntity {
 
   static async authenticate(email: string, password: string) {
     const user: User = await User.findOne({
-      email: email,
+      where: {
+        email,
+      }
     });
     if (!user) {
       throw new NotFound("Unable too login. Please registered yourself");
@@ -112,7 +114,11 @@ class User extends BaseEntity {
 
   @BeforeInsert()
   async userAlreadyExists() {
-    const user = await User.findOne({ email: this.email });
+    const user = await User.findOne({
+      where: {
+        email: this.email
+      }
+    });
     if (user) {
       throw new NotFound("Sorry this email is already in use");
     }

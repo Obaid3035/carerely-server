@@ -38,7 +38,7 @@ class BlogController implements IController{
     try {
       const blogId = req.params.id;
       const blogServiceInstance = Container.get(BlogService);
-      const blog = await blogServiceInstance.show(blogId);
+      const blog = await blogServiceInstance.show(parseInt(blogId));
       res.status(200).json(blog);
     } catch (e) {
       next(e);

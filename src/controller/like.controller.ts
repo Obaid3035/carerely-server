@@ -20,7 +20,7 @@ class LikeController implements IController {
       const user = (req as IRequest).user;
       const postId = req.params.id;
       const likeServiceInstance = Container.get(LikeService)
-      const { liked } = await likeServiceInstance.create(user, postId);
+      const { liked } = await likeServiceInstance.create(user, parseInt(postId));
       res.status(200).json({
         liked
       })

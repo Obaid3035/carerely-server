@@ -1,16 +1,12 @@
 import { Service } from "typedi";
 import User, { UserRole } from "../entities/User";
 import { IUserResponse } from "../interface";
-import BaseService from "./base.service";
+// import BaseService from "./base.service";
 import FriendShip, { FriendShipStatus } from "../entities/FriendShip";
 import Post from "../entities/Post";
 
 @Service()
-class UserService extends BaseService<User> {
-  constructor() {
-    super(User);
-  }
-
+class UserService{
   async searchUsers(search: any) {
     return await User.createQueryBuilder("user")
       .where("user.user_name like :search", {search: `${search}%`})
@@ -47,7 +43,7 @@ class UserService extends BaseService<User> {
     };
   }
 
-  async getUserStats(otherUserId: string) {
+  async getUserStats(otherUserId: number) {
     const postCountPromise = Post.createQueryBuilder("posts")
       .where("posts.user_id = :otherUserId", { otherUserId: otherUserId })
       .getCount();

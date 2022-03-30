@@ -27,8 +27,12 @@ class BlogService {
     }
   }
 
-  async show(blogId: string) {
-    const blog = await Blog.findOne(blogId);
+  async show(blogId: number) {
+    const blog = await Blog.findOne({
+      where: {
+        id: blogId
+      }
+    });
     if (!blog) {
       throw new NotFound("Blog not found")
     }
@@ -54,8 +58,12 @@ class BlogService {
     }
   }
 
-  async update(userInput: Blog, blogId: string, file: any) {
-    const blog = await Blog.findOne(blogId);
+  async update(userInput: Blog, blogId: number, file: any) {
+    const blog = await Blog.findOne({
+      where: {
+        id: blogId
+      }
+    });
     if (!blog) {
       throw new NotFound("Blog not found")
     }

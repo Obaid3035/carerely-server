@@ -1,3 +1,4 @@
+import { DeferrableType } from "../metadata/types/DeferrableType";
 export interface EntitySchemaUniqueOptions {
     /**
      * Unique constraint name.
@@ -6,7 +7,11 @@ export interface EntitySchemaUniqueOptions {
     /**
      * Unique column names.
      */
-    columns?: ((object?: any) => (any[] | {
+    columns?: ((object?: any) => any[] | {
         [key: string]: number;
-    })) | string[];
+    }) | string[];
+    /**
+     * Indicate if unique constraints can be deferred.
+     */
+    deferrable?: DeferrableType;
 }
