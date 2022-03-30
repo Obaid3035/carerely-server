@@ -6,7 +6,7 @@ import helmet from 'helmet';
 import AppDataSource from "./config/database";
 import {IController} from './interface';
 import handleError from './middleware/errorHandler';
-import config from "./config";
+// import config from "./config";
 
 class App {
   public app: Application;
@@ -24,7 +24,7 @@ class App {
       AppDataSource.initialize()
         .then(() => {
           console.log("Data Source has been initialized!")
-          this.app.listen(config.port, () => {
+          this.app.listen(process.env.PORT, () => {
             console.log('Server is up and running');
           });
         })
