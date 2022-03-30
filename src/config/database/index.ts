@@ -5,9 +5,9 @@ const AppDataSource = new DataSource({
   url: "postgres://pwmhszjhwxpvit:99321ac75479a76af5141b63a5b38b210a8ac3a00b545d77b05578a7f9e69950@ec2-34-231-63-30.compute-1.amazonaws.com:5432/d6ag5tpu52r1gg",
   logging: false,
   synchronize: true,
-  entities: [`src/entities/**/*{.ts,.js}`],
+  entities: [`dist/entities/**/*{.ts,.js}`],
   migrations: [
-    "src/migrations/**/*{.ts,.js}"
+    "dist/migrations/**/*{.ts,.js}"
   ],
   ssl: {
     rejectUnauthorized: false
