@@ -24,7 +24,7 @@ class App {
       AppDataSource.initialize()
         .then(() => {
           console.log("Data Source has been initialized!")
-          this.app.listen(process.env.PORT, () => {
+          this.app.listen(4000, () => {
             console.log('Server is up and running');
           });
         })
