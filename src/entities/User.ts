@@ -46,7 +46,11 @@ class User extends BaseEntity {
 
   static async authorize(token: string) {
     const decode = <any> jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne(decode.user._id);
+    const user = await User.findOne({
+      where: {
+        id: decode.user._id
+      }
+    });
     if (!user) {
       throw new UnAuthorized("Session expired")
     }

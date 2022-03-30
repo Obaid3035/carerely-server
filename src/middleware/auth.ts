@@ -8,7 +8,11 @@ const auth = (role: string) => {
 		try{
 			const token = req.headers.authorization.split(' ')[1];
 			const decode = <any> jwt.verify(token, process.env.JWT_SECRET);
-			const user: User = await User.findOne(decode.user.id);
+			const user: User = await User.findOne({
+				where: {
+					id: decode.user.id
+				}
+			});
 			if (!user) {
 				res.status(StatusCodes.UNAUTHORIZED).send({error: "Please Authorize Yourself"});
 			}
