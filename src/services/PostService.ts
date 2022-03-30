@@ -178,12 +178,11 @@ class PostService {
       .take(4)
       .getRawMany();
     const mostLikedPostIds = mostLike.map((like) => like.post_id);
-    console.log(mostLikedPostIds)
 
     if (mostLikedPostIds.length > 0) {
       return await Post.createQueryBuilder("post")
         .select(["post", "user.id", "user.user_name"])
-        .where("post.id IN(:...post_id)", { post_id: [] })
+        .where("post.id IN(:...post_id)", { post_id: mostLikedPostIds })
         .loadRelationCountAndMap("post.like_count", "post.like", "count")
         .loadRelationCountAndMap("post.comment_count", "post.comment")
         .leftJoin("post.user", "user")
