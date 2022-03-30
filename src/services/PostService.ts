@@ -177,16 +177,19 @@ class PostService {
       .orderBy("count", "DESC")
       .take(4)
       .getRawMany();
-
     const mostLikedPostIds = mostLike.map((like) => like.post_id);
+    console.log(mostLikedPostIds)
 
-    return await Post.createQueryBuilder("post")
-      .select(["post", "user.id", "user.user_name"])
-      .where("post.id IN(:...post_id)", { post_id: mostLikedPostIds })
-      .loadRelationCountAndMap("post.like_count", "post.like", "count")
-      .loadRelationCountAndMap("post.comment_count", "post.comment")
-      .leftJoin("post.user", "user")
-      .getMany();
+    if (mostLikedPostIds.length > 0) {
+      return await Post.createQueryBuilder("post")
+        .select(["post", "user.id", "user.user_name"])
+        .where("post.id IN(:...post_id)", { post_id: [] })
+        .loadRelationCountAndMap("post.like_count", "post.like", "count")
+        .loadRelationCountAndMap("post.comment_count", "post.comment")
+        .leftJoin("post.user", "user")
+        .getMany();
+    }
+    return []
   }
 
   async create(userInput: Post, user: User, img: any) {

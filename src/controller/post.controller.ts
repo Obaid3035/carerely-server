@@ -82,6 +82,7 @@ class PostController implements IController {
       const posts = await postInstance.getFewTrendingPost();
       res.status(StatusCodes.OK).json(posts);
     } catch (e) {
+      console.log(e);
       next(e);
     }
   }
