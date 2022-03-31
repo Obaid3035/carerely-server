@@ -76,10 +76,11 @@ class PostController implements IController {
   }
 
 
-  private getFewTrendingPost = async (_req: Request, res: Response, next: NextFunction) => {
+  private getFewTrendingPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const user = (req as IRequest).user;
       const postInstance = Container.get(PostService);
-      const posts = await postInstance.getFewTrendingPost();
+      const posts = await postInstance.getFewTrendingPost(user.id);
       res.status(StatusCodes.OK).json(posts);
     } catch (e) {
       console.log(e);
@@ -102,7 +103,6 @@ class PostController implements IController {
   private otherPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req as IRequest).user;
-      console.log(user.email)
       const otherUserId = req.params.id
       const pageNo = parseInt(<string>req.query.page);
       const size = parseInt(<string>req.query.size);

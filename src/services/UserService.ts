@@ -1,6 +1,5 @@
 import { Service } from "typedi";
 import User, { UserRole } from "../entities/User";
-import { IUserResponse } from "../interface";
 // import BaseService from "./base.service";
 import FriendShip, { FriendShipStatus } from "../entities/FriendShip";
 import Post from "../entities/Post";
@@ -14,7 +13,7 @@ class UserService{
       .getMany();
   }
 
-  async register(userInput: User): Promise<IUserResponse> {
+  async register(userInput: User) {
     console.log("********** Registering user ***********");
     const user = User.create({
       user_name: userInput.user_name,
@@ -28,6 +27,7 @@ class UserService{
     return {
       token,
       auth: true,
+      role: user.role,
     };
   }
 

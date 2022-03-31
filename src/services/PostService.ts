@@ -52,7 +52,10 @@ class PostService {
 
     const postIds = posts.map((post) => post.id);
 
-    if (postIds.length <= 0) return [];
+    if (postIds.length <= 0) return {
+      posts: [],
+      count: postCount
+    };
 
     const comments = await Comment.createQueryBuilder("comment")
       .select(["comment", "user.id", "user.user_name"])
@@ -66,6 +69,7 @@ class PostService {
         user_id: user.id,
       },
     });
+
 
     return {
       posts: Post.mergeCommentLikeAndPost(posts, comments, likedPost),
@@ -169,7 +173,7 @@ class PostService {
     return post;
   }
 
-  async getFewTrendingPost() {
+  async getFewTrendingPost(currUserId: number) {
     const mostLike = await Like.createQueryBuilder("likes")
       .select("COUNT(likes.post_id)", "count")
       .addSelect("post_id")
@@ -179,14 +183,30 @@ class PostService {
       .getRawMany();
     const mostLikedPostIds = mostLike.map((like) => like.post_id);
 
+    const likedPost = await Like.find({
+      where: {
+        user_id: currUserId,
+      },
+    });
+
     if (mostLikedPostIds.length > 0) {
-      return await Post.createQueryBuilder("post")
+      const posts = await Post.createQueryBuilder("post")
         .select(["post", "user.id", "user.user_name"])
         .where("post.id IN(:...post_id)", { post_id: mostLikedPostIds })
         .loadRelationCountAndMap("post.like_count", "post.like", "count")
         .loadRelationCountAndMap("post.comment_count", "post.comment")
         .leftJoin("post.user", "user")
         .getMany();
+
+      return posts.map((post) => {
+        const liked = likedPost.find((like) => {
+          return like.post_id === post.id;
+        })
+        return {
+          ...post,
+          liked: !!liked
+        };
+      })
     }
     return []
   }
@@ -307,9 +327,7 @@ class PostService {
         })
       ).getOne();
 
-    console.log("FRIENDSHIP", completedFriendShip)
-
-    if (completedFriendShip === undefined && partialFriendship === undefined) {
+    if (!completedFriendShip && !partialFriendship) {
       console.log(
         "************ User and other user friendShip does not exist ************"
       );
@@ -318,6 +336,8 @@ class PostService {
         status: "SEND",
       };
     }
+
+    console.log(partialFriendship)
 
     if ((partialFriendship && partialFriendship.status === FriendShipStatus.PARTIAL && partialFriendship.sender_id === currUser.id)
       ||(completedFriendShip && completedFriendShip.status === FriendShipStatus.COMPLETE) ) {
@@ -348,7 +368,12 @@ class PostService {
       const postIds = posts.map((post) => post.id);
 
       if (postIds.length <= 0) {
-        return [];
+        return {
+          friendship: true,
+          status: "VIEW",
+          count: postCount,
+          posts: []
+        };
       }
 
       const comments = await Comment.createQueryBuilder("comment")

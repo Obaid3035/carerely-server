@@ -43,8 +43,8 @@ class UserController implements IController {
   ) => {
     try {
       const userServiceInstance = Container.get(UserService);
-      const { auth, token } = await userServiceInstance.register(req.body);
-      res.status(201).json({ auth, token });
+      const { auth, token, role } = await userServiceInstance.register(req.body);
+      res.status(201).json({ auth, token, role });
     } catch (e) {
       next(e);
     }
