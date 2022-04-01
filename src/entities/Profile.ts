@@ -45,6 +45,9 @@ class Profile extends BaseEntity {
   @CreateDateColumn()
   created_at: Date;
 
+  @Column("int")
+  user_id: number;
+
   @OneToOne(() => User)
   @JoinColumn()
   user: User;

@@ -8,6 +8,8 @@ import CommentController from "./controller/comment.controller";
 import QueriesController from "./controller/queries.controller";
 import AdminBlogController from "./controller/admin/blog.controller";
 import BlogController from "./controller/blog.controller";
+import ProfileController from "./controller/profile.controller";
+import CalorieController from "./controller/calorie.controller";
 
 new App([
   new UserController(),
@@ -18,5 +20,7 @@ new App([
   new CommentController(),
   new QueriesController(),
   new AdminBlogController(),
-  new BlogController()
+  new BlogController(),
+  new ProfileController(),
+  new CalorieController()
 ]).bootstrap();
