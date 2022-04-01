@@ -9,9 +9,9 @@ const AppDataSource = new DataSource({
   migrations: [
     `${process.env.PATH}/migrations/**/*{.ts,.js}`
   ],
-  // ssl: {
-  //   rejectUnauthorized: false
-  // }
+  ssl: {
+    rejectUnauthorized: false
+  }
 })
 
 export default AppDataSource;
