@@ -41,9 +41,7 @@ class App {
   }
 
   private initializeMiddleware() {
-    this.app.use(cors({
-      origin: ["localhost:3000", "https://carerely-client.herokuapp.com"]
-    }));
+    this.app.use(cors());
     this.app.use(helmet());
     // this.app.use(
     //     rateLimit({
