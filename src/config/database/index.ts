@@ -5,13 +5,13 @@ const AppDataSource = new DataSource({
   url: process.env.DATABASE_URL,
   logging: false,
   synchronize: true,
-  entities: [`${process.env.PATH}/entities/**/*{.ts,.js}`],
+  entities: [`${process.env.PROJECT_PATH}/entities/**/*{.ts,.js}`],
   migrations: [
-    `${process.env.PATH}/migrations/**/*{.ts,.js}`
+    `${process.env.PROJECT_PATH}/migrations/**/*{.ts,.js}`
   ],
-  ssl: {
-    rejectUnauthorized: false
-  }
+  // ssl: {
+  //   rejectUnauthorized: false
+  // }
 })
 
 export default AppDataSource;
