@@ -21,6 +21,18 @@ class PostController implements IController {
       .get(`${this.path}/user/:id`, auth(UserRole.USER), this.otherPost)
       .get(`${this.path}/current-user`, auth(UserRole.USER), this.currentUserPost)
       .get(`${this.path}/:id`, auth(UserRole.USER), this.show)
+      .delete(`${this.path}/:id`, auth(UserRole.USER), this.delete)
+  }
+
+  private delete = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const postId = req.params.id;
+      const postInstance = Container.get(PostService);
+      const posts = await postInstance.delete(parseInt(postId));
+      res.status(StatusCodes.OK).json(posts);
+    } catch (e) {
+      next(e);
+    }
   }
 
   private index = async (req: Request, res: Response, next: NextFunction) => {

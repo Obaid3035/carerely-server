@@ -17,9 +17,12 @@ class Comment extends BaseEntity {
   @PrimaryGeneratedColumn()
     id: number;
 
-  @ManyToOne(() => Post, (post) => post.comment)
+  @ManyToOne(() => Post, (post) => post.comment, {
+    onDelete: "CASCADE"
+  })
   @JoinColumn({
     name: 'post_id',
+
   })
     post: Post;
 

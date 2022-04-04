@@ -15,6 +15,18 @@ class CommentController implements IController{
   constructor() {
     this.router
       .post(`${this.path}/:id`, auth(UserRole.USER), this.create)
+      .delete(`${this.path}/:id`, auth(UserRole.USER), this.delete)
+  }
+
+  private delete = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const commentId = req.params.id;
+      const commentServiceInstance = Container.get(CommentService);
+      const comment  = await commentServiceInstance.delete(parseInt(commentId))
+      res.status(StatusCodes.CREATED).json(comment)
+    } catch (e) {
+      next(e);
+    }
   }
 
   private create = async (req: Request, res: Response, next: NextFunction) => {

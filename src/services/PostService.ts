@@ -6,9 +6,33 @@ import FriendShip  from "../entities/FriendShip";
 import Comment from "../entities/Comment";
 import Like from "../entities/Like";
 import cloudinary from "../utils/cloudinary";
+import NotFound from "../utils/errorCode";
 
 @Service()
 class PostService {
+
+  async delete(postId: number) {
+    const post = await Post.findOne({
+      where: {
+        id: postId
+      }
+    })
+
+    console.log(post)
+
+    if(!post) {
+      throw new NotFound("Post not found")
+    }
+    if (post.image) {
+      await cloudinary.v2.uploader.destroy(
+        post.image.cloudinary_id
+      );
+    }
+    await Post.delete(post.id)
+    return {
+      message: "Post deleted successfully"
+    }
+  }
 
   async index(user: User, skip: number, limit: number): Promise<any> {
     console.log(

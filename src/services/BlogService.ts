@@ -10,11 +10,7 @@ class BlogService {
         is_featured: true
       }
     });
-    const nonFeaturedBlogPromise = Blog.find({
-      where: {
-        is_featured: false
-      }
-    });
+    const nonFeaturedBlogPromise = Blog.find();
     const [featuredBlog, nonFeaturedBlog] = await Promise.all([
       featuredBlogPromise, nonFeaturedBlogPromise])
 

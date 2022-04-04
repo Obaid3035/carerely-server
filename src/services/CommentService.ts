@@ -6,6 +6,24 @@ import Comment from "../entities/Comment";
 
 @Service()
 class CommentService {
+
+  async delete(commentId: number) {
+    const comment = await Comment.findOne({
+      where: {
+        id: commentId
+      }
+    })
+
+    if(!comment) {
+      throw new NotFound("Comment not found")
+    }
+
+    await Comment.delete(comment.id)
+    return {
+      message: "Comment deleted successfully!"
+    }
+  }
+
   async create(currUser: User, postId: number, userInput: Comment) {
     const post: Post = await Post.findOne({
       where: {

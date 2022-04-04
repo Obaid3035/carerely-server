@@ -68,12 +68,14 @@ class Post extends BaseEntity {
   user_id: number;
 
   @OneToMany(() => Like, (like) => like.post, {
-    nullable: true
+    nullable: true,
+    onDelete: "CASCADE"
   })
-  like: Post[];
+  like: Like[];
 
   @OneToMany(() => Comment, (comment) => comment.post, {
-    nullable: true
+    nullable: true,
+    onDelete: "CASCADE"
   })
   comment: Comment;
 
