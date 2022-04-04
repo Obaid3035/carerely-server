@@ -17,6 +17,7 @@ import { BadRequest, NotFound, UnAuthorized } from "../utils/errorCode";
 import Profile from "./Profile";
 import Queries from "./Queries";
 import Blog from "./Blog";
+import Calorie from "./Calorie";
 
 export enum UserRole {
   USER = "user",
@@ -107,7 +108,10 @@ class User extends BaseEntity {
   queries: Queries
 
   @OneToMany(() => Blog, (blog) => blog.user)
-  blog: Queries
+  blog: Blog
+
+  @OneToMany(() => Calorie, (calorie) => calorie.user)
+  calorie: Calorie
 
   generateToken() {
     const user = this;

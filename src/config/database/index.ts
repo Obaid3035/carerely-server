@@ -2,16 +2,17 @@ import { DataSource } from "typeorm"
 
 const AppDataSource = new DataSource({
   type: "postgres",
-  url: process.env.DATABASE_URL,
+  url: "postgres://uzqpzlmypzkdkp:a4f94151ff2ecbe239f0962130b6753018636c553aa9e2c60a5c2f4baf46d7e3@ec2-23-20-224-166.compute-1.amazonaws.com:5432/dbu76ag6mhjmek",
   logging: false,
-  synchronize: true,
+  synchronize: false,
   entities: [`${process.env.PROJECT_PATH}/entities/**/*{.ts,.js}`],
   migrations: [
-    `${process.env.PROJECT_PATH}/migrations/**/*{.ts,.js}`
+    `dist/migrations/*{.ts,.js}`
   ],
   ssl: {
     rejectUnauthorized: false
   }
 })
+
 
 export default AppDataSource;

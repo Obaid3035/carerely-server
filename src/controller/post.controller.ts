@@ -95,7 +95,6 @@ class PostController implements IController {
       const post  = await postInstance.create(req.body, user, req.file);
       res.status(StatusCodes.CREATED).json(post);
     } catch (e) {
-      console.log(e);
       next(e);
     }
   };

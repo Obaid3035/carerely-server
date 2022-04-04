@@ -23,27 +23,13 @@ class FriendShip extends BaseEntity {
     // getting all the ids of user that the current user follows
     let validUserIds = [curUserId];
     friendShips.forEach((friendShip) => {
-      switch (friendShip.status) {
-        case FriendShipStatus.PARTIAL:
-          if (friendShip.receiver_id !== curUserId) {
-            validUserIds.push(friendShip.receiver_id);
-          }
-          break;
-        case FriendShipStatus.COMPLETE:
-          validUserIds.push(friendShip.sender_id);
-      }
+      validUserIds.push(friendShip.receiver_id);
     });
     return validUserIds
   }
 
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column("enum", {
-    enum: FriendShipStatus,
-    default: FriendShipStatus.PARTIAL
-  })
-  status: string;
 
   @ManyToOne(() => User, (user) => user.sender, {
     nullable: false
@@ -71,23 +57,13 @@ class FriendShip extends BaseEntity {
   @BeforeInsert()
   async checkIfFriendShipAlreadyExists() {
     const friendship = this;
-
-    const found_1 = await FriendShip.findOne({
+    const friendShip = await FriendShip.findOne({
       where: {
         sender_id: friendship.sender.id,
         receiver_id: friendship.receiver.id
       }
     })
-    if (found_1) {
-      throw new BadRequest("Sorry friendship is already exist");
-    }
-    const found_2 = await FriendShip.findOne({
-      where: {
-        sender_id: friendship.receiver.id,
-        receiver_id: friendship.sender.id
-      }
-    })
-    if (found_2) {
+    if (friendShip) {
       throw new BadRequest("Sorry friendship is already exist");
     }
   }

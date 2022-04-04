@@ -16,19 +16,19 @@ class ProfileService {
       height_unit: userInput.height_unit,
       weight: userInput.weight,
       weight_unit: userInput.weight_unit,
-      user_id: currUser.id,
+      user: currUser
     });
     const savedProfile = await profile.save();
-    if (savedProfile) {
-      currUser.profile_setup = true;
-      const user = await currUser.save();
-      const token = user.generateToken();
-      return {
-        saved: true,
-        token,
-      };
+    if (!savedProfile) {
+      throw new Error("Something went wrong");
     }
-    throw new Error("Something went wrong");
+    currUser.profile_setup = true;
+    const user = await currUser.save();
+    const token = user.generateToken();
+    return {
+      saved: true,
+      token,
+    };
   }
 
   async show(currUserId: number) {
@@ -40,11 +40,22 @@ class ProfileService {
   }
 
   async update(currUserId: number, userInput: Profile) {
-    console.log(userInput, currUserId)
-   // await Profile.update(currUserId, userInput);
-   return {
-     updated: true,
-   }
+    console.log(userInput, currUserId);
+    const profile = await Profile.update(currUserId, {
+      dob: userInput.dob,
+      weight: userInput.weight,
+      weight_unit: userInput.weight_unit,
+      height: userInput.height,
+      height_unit: userInput.height_unit
+    });
+    if (!profile) {
+      throw new BadRequest("Profile cannot be updated")
+    }
+    console.log(profile)
+    return {
+      updated: true,
+    };
   }
 }
-export default ProfileService
+
+export default ProfileService;

@@ -3,9 +3,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
+  JoinColumn, OneToOne,
+  PrimaryGeneratedColumn
 } from "typeorm";
 import User from "./User";
 
@@ -48,8 +47,13 @@ class Profile extends BaseEntity {
   @Column("int")
   user_id: number;
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @OneToOne(() => User, (user) => user.profile, {
+    nullable: false,
+    eager: true
+  })
+  @JoinColumn({
+    name: "user_id"
+  })
   user: User;
 }
 

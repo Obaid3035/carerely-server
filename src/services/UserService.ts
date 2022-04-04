@@ -1,7 +1,7 @@
 import { Service } from "typedi";
 import User, { UserRole } from "../entities/User";
 // import BaseService from "./base.service";
-import FriendShip, { FriendShipStatus } from "../entities/FriendShip";
+import FriendShip  from "../entities/FriendShip";
 import Post from "../entities/Post";
 
 @Service()
@@ -52,12 +52,10 @@ class UserService{
       .where("friendship.receiver_id = :receiverId", {
         receiverId: otherUserId,
       })
-      .orWhere("friendship.status = :status", {status: FriendShipStatus.COMPLETE})
       .getCount();
 
     const followingsCountPromise = FriendShip.createQueryBuilder("friendship")
       .where("friendship.sender_id = :senderId", { senderId: otherUserId })
-      .orWhere("friendship.status = :status", {status: FriendShipStatus.COMPLETE})
       .getCount();
 
     const otherUserPromise = User.findOne({

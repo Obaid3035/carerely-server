@@ -27,6 +27,7 @@ class ProfileController implements IController {
       const profile = await profileServiceInstance.create(user, req.body);
       res.status(201).json(profile)
     } catch (e) {
+      console.log(e);
       next(e);
     }
   };

@@ -1,9 +1,8 @@
 import { Service } from "typedi";
 // import BaseService from "./base.service";
-import FriendShip, { FriendShipStatus } from "../entities/FriendShip";
+import FriendShip  from "../entities/FriendShip";
 import User from "../entities/User";
-import BadRequest, { NotFound } from "../utils/errorCode";
-import { Brackets } from "typeorm";
+import { NotFound } from "../utils/errorCode";
 
 @Service()
 class FriendShipService {
@@ -58,112 +57,29 @@ class FriendShipService {
 
     console.log("*********** FriendShip Created Successfully *************");
     return {
-      saved: true,
-      status: "VIEW",
+      friendship: true
     };
   }
 
-  async acceptFriendShipRequest(receiver: User, senderId: number) {
-    const sender: User = await User.findOne({
-      where: {
-        id: senderId
-      }
-    });
-    if (!sender) {
-      throw new NotFound("User not found");
-    }
-
-    const friendShip = await FriendShip.findOne({
-      where: {
-        sender_id: sender.id,
-        receiver_id: receiver.id,
-      },
-    });
-
-    if (friendShip.status === FriendShipStatus.COMPLETE) {
-      throw new BadRequest("Sorry friendship is already complete");
-    }
-
-    friendShip.status = FriendShipStatus.COMPLETE;
-    await friendShip.save();
-    return {
-      updated: true,
-      status: "VIEW",
-    };
-  }
-
-  async declineFriendShipRequest(receiver: User, senderId: number) {
-    const sender: User = await User.findOne({
-      where: {
-        id: senderId
-      }
-    });
-    if (!sender) {
-      throw new NotFound("User not found");
-    }
-
-    const friendShip = await FriendShip.findOne({
-      where: {
-        sender_id: sender.id,
-        receiver_id: receiver.id,
-      },
-    });
-
-    if (!friendShip) {
-      throw new BadRequest("Sorry FriendShip Request does not exist");
-    }
-
-    await FriendShip.delete(friendShip.id);
-    return {
-      deleted: true,
-      status: "SEND",
-    };
-  }
-
-  async deleteFriendShip(userId_1: string, user_2: User) {
+  async deleteFriendShip(userId_1: string, currUserId: User) {
     console.log(
       "************** Checking if user 1 is the sender and user 2 is receiver *************"
     );
     const friendShip_1 = await FriendShip.createQueryBuilder("friendship")
-      .where(
-        new Brackets((qb) => {
-          qb.where("friendship.receiver_id = :receiver_id", {
-            receiver_id: userId_1,
-          }).andWhere("friendship.sender_id = :sender_id", {
-            sender_id: user_2.id,
-          });
-        })
-      )
-      .getOne();
+      .where("friendship.receiver_id = :receiver_id", {
+        receiver_id: userId_1,
+      }).andWhere("friendship.sender_id = :sender_id", {
+        sender_id: currUserId.id,
+      }).getOne();
 
-    const friendShip_2 = await FriendShip.createQueryBuilder("friendship")
-      .where(
-        new Brackets((qb) => {
-          qb.where("friendship.receiver_id = :receiver_id", {
-            receiver_id: user_2.id,
-          }).andWhere("friendship.sender_id = :sender_id", {
-            sender_id: userId_1,
-          });
-        })
-      )
-      .getOne();
-
-    console.log(userId_1, user_2.id);
-
-    if (!friendShip_1 && !friendShip_2) {
+    if (!friendShip_1) {
       throw new Error("No FriendShip Found");
     }
 
-    if (friendShip_1) {
-      await FriendShip.delete(friendShip_1.id);
-    } else {
-      await FriendShip.delete(friendShip_2.id);
-    }
-
+    await FriendShip.delete(friendShip_1.id);
     console.log("************** FriendShip Successfully deleted *************");
     return {
-      deleted: true,
-      status: "SEND",
+      friendship: false,
     };
   }
 }

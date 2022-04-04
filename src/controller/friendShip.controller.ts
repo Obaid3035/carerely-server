@@ -14,22 +14,11 @@ class FriendShipController implements IController {
   constructor() {
     this.router
       .post(`${this.path}/sent/:receiverId`, auth(UserRole.USER), this.sendFriendShipRequest)
-      .put(`${this.path}/accept/:senderId`, auth(UserRole.USER), this.acceptFriendShipRequest)
-      .delete(
-        `${this.path}/decline/:senderId`,
-        auth(UserRole.USER),
-        this.declineFriendShipRequest
-      )
-      .delete(
-        `${this.path}/:id`,
-        auth(UserRole.USER),
-        this.unFollowFriendship
-      )
       .get(`${this.path}/followings`, auth(UserRole.USER), this.getCurrentUserFollowing)
       .get(`${this.path}/followers`, auth(UserRole.USER), this.getCurrentUserFollower)
       .get(`${this.path}/followings/:id`, auth(UserRole.USER), this.getOtherUserFollowing)
       .get(`${this.path}/followers/:id`, auth(UserRole.USER), this.getOtherUserFollower)
-
+      .delete(`${this.path}/:id`, auth(UserRole.USER), this.unFollowFriendship)
       .delete(`${this.path}/delete-friendship/:userId`, auth(UserRole.USER), this.deleteFriendShip);
   }
 
@@ -119,58 +108,11 @@ class FriendShipController implements IController {
       const { receiverId } = req.params;
       const sender: User = (<IRequest>req).user;
       const friendShipInstance = Container.get(FriendShipService);
-      const { saved, status } = await friendShipInstance.sendFriendShipRequest(
+      const friendShip = await friendShipInstance.sendFriendShipRequest(
         sender,
         parseInt(receiverId)
       );
-      res.status(StatusCodes.CREATED).json({
-        saved,
-        status
-      });
-    } catch (e) {
-      next(e);
-    }
-  };
-
-  private acceptFriendShipRequest = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const { senderId } = req.params;
-      const receiver: User = (<IRequest>req).user;
-      const friendShipInstance = Container.get(FriendShipService);
-      const { updated, status } = await friendShipInstance.acceptFriendShipRequest(
-        receiver,
-        parseInt(senderId)
-      );
-      res.status(StatusCodes.OK).json({
-        updated,
-        status
-      });
-    } catch (e) {
-      next(e);
-    }
-  };
-
-  private declineFriendShipRequest = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const { senderId } = req.params;
-      const receiver: User = (<IRequest>req).user;
-      const friendShipInstance = Container.get(FriendShipService);
-      const { deleted, status } = await friendShipInstance.declineFriendShipRequest(
-        receiver,
-        parseInt(senderId)
-      );
-      res.status(200).json({
-        deleted,
-        status
-      });
+      res.status(StatusCodes.CREATED).json(friendShip);
     } catch (e) {
       next(e);
     }
@@ -186,14 +128,11 @@ class FriendShipController implements IController {
       const user_2: User = (<IRequest>req).user;
       const friendShipInstance = Container.get(FriendShipService);
 
-      const { deleted, status } = await friendShipInstance.deleteFriendShip(
+      const friendShip = await friendShipInstance.deleteFriendShip(
           userId,
         user_2
       );
-      res.status(200).json({
-        deleted,
-        status
-      });
+      res.status(200).json(friendShip);
     } catch (e) {
       next(e);
     }

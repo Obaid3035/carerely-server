@@ -2,8 +2,7 @@
 import Post from "../entities/Post";
 import User from "../entities/User";
 import { Service } from "typedi";
-import FriendShip, { FriendShipStatus } from "../entities/FriendShip";
-import { Brackets } from "typeorm";
+import FriendShip  from "../entities/FriendShip";
 import Comment from "../entities/Comment";
 import Like from "../entities/Like";
 import cloudinary from "../utils/cloudinary";
@@ -17,9 +16,6 @@ class PostService {
     );
     const friendShips = await FriendShip.createQueryBuilder("friendship")
       .where("friendship.sender_id = :sender_id", { sender_id: user.id })
-      .orWhere("friendship.receiver_id = :receiver_id", {
-        receiver_id: user.id,
-      })
       .getMany();
 
     const validUserIds = FriendShip.getValidUserIdsForPost(
@@ -122,7 +118,10 @@ class PostService {
 
     const postIds = posts.map((post) => post.id);
 
-    if (postIds.length <= 0) return [];
+    if (postIds.length <= 0) return {
+      posts: [],
+      count: 0
+    }
 
     const comments = await Comment.createQueryBuilder("comment")
       .select(["comment", "user.id", "user.user_name"])
@@ -259,7 +258,6 @@ class PostService {
     return post;
   }
 
-  // @ts-ignore
   async otherPost(
     currUser: User,
     otherUserId: string,
@@ -273,137 +271,76 @@ class PostService {
     console.log(
       "************ Checking if user and otherUser have a friendShip ************"
     );
-    const completedFriendShip = await FriendShip.createQueryBuilder("friendship")
-      .where(
-        new Brackets((qb) => {
-          qb.where(`friendship.status = :status`, {
-            status: FriendShipStatus.COMPLETE,
-          })
-            .orWhere(
-              new Brackets((qb) => {
-                qb.where("friendship.receiver_id = :receiver_id", {
-                  receiver_id: otherUserId,
-                }).andWhere("friendship.sender_id = :sender_id", {
-                  sender_id: currUser.id,
-                });
-              })
-            )
-            .orWhere(
-              new Brackets((qb) => {
-                qb.where("friendship.receiver_id = :receiver_id", {
-                  receiver_id: currUser.id,
-                }).andWhere("friendship.sender_id = :sender_id", {
-                  sender_id: otherUserId,
-                });
-              })
-            );
-        })
-      ).getOne();
 
-    const partialFriendship = await FriendShip.createQueryBuilder("friendship")
-      .where(
-        new Brackets((qb) => {
-          qb.where(`friendship.status = :status`, {
-            status: FriendShipStatus.PARTIAL,
-          })
-            .orWhere(
-              new Brackets((qb) => {
-                qb.where("friendship.receiver_id = :receiver_id", {
-                  receiver_id: otherUserId,
-                }).andWhere("friendship.sender_id = :sender_id", {
-                  sender_id: currUser.id,
-                });
-              })
-            )
-            .orWhere(
-              new Brackets((qb) => {
-                qb.where("friendship.receiver_id = :receiver_id", {
-                  receiver_id: currUser.id,
-                }).andWhere("friendship.sender_id = :sender_id", {
-                  sender_id: otherUserId,
-                });
-              })
-            );
-        })
-      ).getOne();
+    const friendShip = await FriendShip.createQueryBuilder("friendship")
+      .where("friendship.receiver_id = :receiver_id", {
+        receiver_id: otherUserId,
+      }).andWhere("friendship.sender_id = :sender_id", {
+        sender_id: currUser.id,
+      }).getOne();
 
-    if (!completedFriendShip && !partialFriendship) {
+    if (!friendShip) {
       console.log(
         "************ User and other user friendShip does not exist ************"
       );
       return {
-        friendShip: false,
-        status: "SEND",
+        friendship: false,
       };
     }
+    console.log(
+      "************ Fetching all the post that other user ************"
+    );
+    const postsPromise = Post.createQueryBuilder("post")
+      .select(["post", "post_user.id", "post_user.user_name"])
+      .where("post.user_id = :user_id", { user_id: otherUserId })
+      .innerJoin("post.user", "post_user")
+      .loadRelationCountAndMap("post.like_count", "post.like")
+      .loadRelationCountAndMap("post.comment_count", "post.comment")
+      .orderBy("post.created_at", "DESC")
+      .skip(skip)
+      .take(limit)
+      .getMany();
 
-    console.log(partialFriendship)
-
-    if ((partialFriendship && partialFriendship.status === FriendShipStatus.PARTIAL && partialFriendship.sender_id === currUser.id)
-      ||(completedFriendShip && completedFriendShip.status === FriendShipStatus.COMPLETE) ) {
-      console.log(
-        "************ Fetching all the post that other user ************"
-      );
-      const postsPromise = Post.createQueryBuilder("post")
-
-        .select(["post", "post_user.id", "post_user.user_name"])
-        .where("post.user_id = :user_id", { user_id: otherUserId })
-        .innerJoin("post.user", "post_user")
-        .loadRelationCountAndMap("post.like_count", "post.like")
-        .loadRelationCountAndMap("post.comment_count", "post.comment")
-        .orderBy("post.created_at", "DESC")
-        .skip(skip)
-        .take(limit)
-        .getMany();
-
-      const postCountPromise = Post.createQueryBuilder("post")
-        .where("post.user_id = :user_id", { user_id: otherUserId })
-        .innerJoin("post.user", "post_user")
-        .getCount()
+    const postCountPromise = Post.createQueryBuilder("post")
+      .where("post.user_id = :user_id", { user_id: otherUserId })
+      .innerJoin("post.user", "post_user")
+      .getCount()
 
 
-      const [posts, postCount] = await Promise.all([postsPromise, postCountPromise])
+    const [posts, postCount] = await Promise.all([postsPromise, postCountPromise])
 
 
-      const postIds = posts.map((post) => post.id);
+    const postIds = posts.map((post) => post.id);
 
-      if (postIds.length <= 0) {
-        return {
-          friendship: true,
-          status: "VIEW",
-          count: postCount,
-          posts: []
-        };
-      }
-
-      const comments = await Comment.createQueryBuilder("comment")
-        .select([
-          "comment",
-          "user.id",
-          "user.user_name",
-        ])
-        .where("comment.post_id IN(:...post_id)", { post_id: postIds })
-        .innerJoin("comment.user", "user")
-        .orderBy("comment.created_at", "ASC")
-        .getMany();
-
-      const likedPost = await Like.find({
-        where: {
-          user_id: currUser.id,
-        },
-      });
+    if (postIds.length <= 0) {
       return {
         friendship: true,
-        status: "VIEW",
         count: postCount,
-        posts: Post.mergeCommentLikeAndPost(posts, comments, likedPost),
+        posts: []
       };
     }
 
+    const comments = await Comment.createQueryBuilder("comment")
+      .select([
+        "comment",
+        "user.id",
+        "user.user_name",
+      ])
+      .where("comment.post_id IN(:...post_id)", { post_id: postIds })
+      .innerJoin("comment.user", "user")
+      .orderBy("comment.created_at", "ASC")
+      .getMany();
+
+    const likedPost = await Like.find({
+      where: {
+        user_id: currUser.id,
+      },
+    });
     return {
       friendship: true,
-      status: "ACCEPT"
-    }
+      count: postCount,
+      posts: Post.mergeCommentLikeAndPost(posts, comments, likedPost),
+    };
   }
 }
 
