@@ -18,8 +18,6 @@ class PostService {
       }
     })
 
-    console.log(post)
-
     if(!post) {
       throw new NotFound("Post not found")
     }

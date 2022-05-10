@@ -18,16 +18,21 @@ class Calorie extends BaseEntity {
   @Column("varchar")
   mealType: string
 
-  @Column("simple-json", {
-    nullable: false
-  })
-  foodDetail: {
-    calorie: number,
-    protein: number,
-    carb: number,
-    fat: number,
-    sugar: number
-  };
+  @Column("float")
+  calorie: number
+
+  @Column("float")
+  carb: number
+
+  @Column("float")
+  protein: number
+
+  @Column("float")
+  fat: number
+
+  @Column("float")
+  sugar: number
+
 
   @ManyToOne(() => User, (user) => user.calorie)
   @JoinColumn({

@@ -2,7 +2,8 @@ import { IController, IRequest } from "../interface";
 import { NextFunction, Request, Response, Router } from "express";
 import { Container } from "typedi";
 import CalorieService from "../services/CalorieService";
-import User from "../entities/User";
+import User, { UserRole } from "../entities/User";
+import auth from "../middleware/auth";
 
 
 class CalorieController implements IController {
@@ -11,8 +12,11 @@ class CalorieController implements IController {
 
   constructor() {
     this.router
+      .get(`${this.path}/history`, auth(UserRole.USER), this.history)
       .get(`${this.path}`, this.getFoodProducts)
-      .post(`${this.path}`, this.create)
+      .post(`${this.path}`, auth(UserRole.USER), this.create)
+      .get(`${this.path}/stats/:id`, auth(UserRole.USER), this.getFoodStats)
+      .get(`${this.path}/monthly`, auth(UserRole.USER), this.monthlyCalorie)
 
   }
 
@@ -30,6 +34,22 @@ class CalorieController implements IController {
     }
   }
 
+  private history = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const pageNo = parseInt(<string>req.query.page);
+      const size = parseInt(<string>req.query.size);
+      const calorieServiceInstance = Container.get(CalorieService);
+      const foodProducts = await calorieServiceInstance.history((req as IRequest).user, size * pageNo, size);
+      res.status(200).json(foodProducts);
+    } catch (e) {
+      next(e);
+    }
+  }
+
   private create = async (
     req: Request,
     res: Response,
@@ -41,23 +61,35 @@ class CalorieController implements IController {
       const foodProducts = await calorieServiceInstance.create(req.body, currUser)
       res.status(200).json(foodProducts);
     } catch (e) {
+      console.log(e);
       next(e);
     }
   }
 
-  // private getFoodStats = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction
-  // ) => {
-  //   try {
-  //     const calorieServiceInstance = Container.get(CalorieService);
-  //     const foodProducts = await calorieServiceInstance.getFoodStats()
-  //     res.status(200).json(foodProducts);
-  //   } catch (e) {
-  //     next(e);
-  //   }
-  // }
+  private getFoodStats = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const calorieServiceInstance = Container.get(CalorieService);
+      const foodProducts = await calorieServiceInstance.getFoodStats(req.params.id)
+      res.status(200).json(foodProducts);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+
+  private monthlyCalorie = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const calorieServiceInstance = Container.get(CalorieService)
+      const foodProducts = await calorieServiceInstance.monthlyCalorie();
+      res.status(200).json(foodProducts);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export default CalorieController;
