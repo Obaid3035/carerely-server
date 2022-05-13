@@ -109,7 +109,44 @@ class CalorieService {
     }
   }
 
-  async getFoodStats(calorieId: any) {
+  async getFoodStats(calorieId: string, type: any) {
+
+    if (type === "SUM") {
+      const calorie = await Calorie.createQueryBuilder("calorie")
+        .where("calorie.created_at >= :today", { today: moment().hour(0).minutes(0).second(0).toDate()})
+        .getMany()
+
+      if(!calorie) {
+        throw new NotFound("Calorie not found");
+      }
+
+      // @ts-ignore
+      let sumCalorie = calorie.reduce((curVal, acc) => {
+
+        return {
+          calorie: +curVal.calorie + acc.calorie,
+          carb: +curVal.carb + acc.carb,
+          protein: +curVal.protein + acc.protein,
+          fat: +curVal.fat + acc.fat,
+          sugar: +curVal.sugar + acc.sugar
+        }
+      }, {
+        calorie: 0,
+        carb: 0,
+        protein: 0,
+        fat: 0,
+        sugar: 0
+      })
+
+      return {
+        calorie: sumCalorie.calorie.toFixed(1),
+        carb: sumCalorie.carb.toFixed(1),
+        fat: sumCalorie.fat.toFixed(1),
+        sugar: sumCalorie.sugar.toFixed(1),
+        protein: sumCalorie.protein.toFixed(1),
+      };
+    }
+
     const calorie = await Calorie.findOne({
       where: {
         id: parseInt(calorieId)
@@ -120,14 +157,15 @@ class CalorieService {
       throw new NotFound("Calorie not found");
     }
 
-
     return {
-      calorie: (calorie.calorie / 10).toFixed(2),
-      carb: (calorie.calorie / 8).toFixed(2),
-      fat: (calorie.fat / 8).toFixed(2),
-      sugar: (calorie.sugar / 8).toFixed(2),
-      protein: (calorie.protein / 8).toFixed(2),
+      calorie: calorie.calorie,
+      carb: calorie.carb,
+      fat: calorie.fat,
+      sugar: calorie.sugar,
+      protein: calorie.protein,
     };
+
+
   }
 }
 

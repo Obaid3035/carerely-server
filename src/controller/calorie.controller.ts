@@ -73,7 +73,7 @@ class CalorieController implements IController {
   ) => {
     try {
       const calorieServiceInstance = Container.get(CalorieService);
-      const foodProducts = await calorieServiceInstance.getFoodStats(req.params.id)
+      const foodProducts = await calorieServiceInstance.getFoodStats(req.params.id, req.query.type)
       res.status(200).json(foodProducts);
     } catch (e) {
       next(e);
