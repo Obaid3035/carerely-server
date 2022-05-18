@@ -158,11 +158,11 @@ class CalorieService {
     }
 
     return {
-      calorie: calorie.calorie,
-      carb: calorie.carb,
-      fat: calorie.fat,
-      sugar: calorie.sugar,
-      protein: calorie.protein,
+      calorie: calorie.calorie.toFixed(1),
+      carb: calorie.carb.toFixed(1),
+      fat: calorie.fat.toFixed(1),
+      sugar: calorie.sugar.toFixed(1),
+      protein: calorie.protein.toFixed(1),
     };
 
 
