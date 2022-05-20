@@ -41,6 +41,7 @@ class App {
   }
 
   private initializeMiddleware() {
+
     this.app.use(cors());
     this.app.use(helmet());
     // this.app.use(
