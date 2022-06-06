@@ -65,12 +65,12 @@ class MessageService {
       sender: currentUser
     });
 
-    conversation.latest_message = userInput.content;
+    // conversation.latest_message = userInput.content;
 
-    const messagePromise = messageInstance.save();
-    const conversationPromise = conversation.save();
+    const message = await messageInstance.save();
+    // const conversationPromise = conversation.save();
 
-    const [message] = await Promise.all([messagePromise, conversationPromise]);
+    // const [message] = await Promise.all([messagePromise, conversationPromise]);
 
     return message
   }
