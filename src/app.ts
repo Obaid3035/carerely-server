@@ -46,7 +46,6 @@ class App {
   private static initializeSocket(server: http.Server) {
     new EventHandler(
       new Server(server, {
-        pingTimeout: 60000,
         cors: {
           origin: "https://carerely-client.herokuapp.com",
         },

@@ -38,6 +38,7 @@ class MessageService {
 
 
     const message = await Message.createQueryBuilder("message")
+      .where("message.conversation_id = :conversation_id", { conversation_id: conversation.id})
       .orderBy("message.created_at", "ASC")
       .getMany()
 
