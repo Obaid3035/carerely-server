@@ -115,7 +115,6 @@ class User extends BaseEntity {
 
   generateToken() {
     const user = this;
-    console.log(user)
     delete user.password
     return jwt.sign({ user }, process.env.JWT_SECRET);
   }

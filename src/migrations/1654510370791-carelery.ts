@@ -1,6 +1,6 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class carelery1652186766927 implements MigrationInterface {
+export class carelery1654510370791 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<any> {
         await queryRunner.query(`CREATE TABLE "friendship" ("id" SERIAL NOT NULL, "sender_id" integer NOT NULL, "receiver_id" integer NOT NULL, CONSTRAINT "PK_dbd6fb568cd912c5140307075cc" PRIMARY KEY ("id"))`);
@@ -17,6 +17,8 @@ export class carelery1652186766927 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "user" ("id" SERIAL NOT NULL, "user_name" character varying(25) NOT NULL, "email" character varying(50) NOT NULL, "password" character varying NOT NULL, "role" "user_role_enum" NOT NULL, "profile_setup" boolean NOT NULL DEFAULT false, CONSTRAINT "UQ_e12875dfb3b1d92d7d7c5377e22" UNIQUE ("email"), CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "IDX_d34106f8ec1ebaf66f4f8609dd" ON "user" ("user_name") `);
         await queryRunner.query(`CREATE TABLE "answer" ("id" SERIAL NOT NULL, "text" character varying NOT NULL, "user_id" integer NOT NULL, "queries_id" integer NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_9232db17b63fb1e94f97e5c224f" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "message" ("id" SERIAL NOT NULL, "content" character varying NOT NULL, "sender_id" integer NOT NULL, "conversation_id" integer NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_ba01f0a3e0123651915008bc578" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "conversation" ("id" SERIAL NOT NULL, "sender_id" integer NOT NULL, "receiver_id" integer NOT NULL, "latest_message" character varying, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_864528ec4274360a40f66c29845" PRIMARY KEY ("id"))`);
         await queryRunner.query(`ALTER TABLE "friendship" ADD CONSTRAINT "FK_86463167c10dc37dbf9d39728bd" FOREIGN KEY ("sender_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "friendship" ADD CONSTRAINT "FK_8cced01afb7c006b9643aed97bf" FOREIGN KEY ("receiver_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "like" ADD CONSTRAINT "FK_d41caa70371e578e2a4791a88ae" FOREIGN KEY ("post_id") REFERENCES "post"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -31,9 +33,17 @@ export class carelery1652186766927 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "calorie" ADD CONSTRAINT "FK_842f2b31ce92d176de532ff1268" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "answer" ADD CONSTRAINT "FK_add8ab72aec4ce5eb87fdc2740d" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "answer" ADD CONSTRAINT "FK_c3ebb08f68fdace3de1f5d51d2a" FOREIGN KEY ("queries_id") REFERENCES "queries"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "message" ADD CONSTRAINT "FK_c0ab99d9dfc61172871277b52f6" FOREIGN KEY ("sender_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "message" ADD CONSTRAINT "FK_7fe3e887d78498d9c9813375ce2" FOREIGN KEY ("conversation_id") REFERENCES "conversation"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "conversation" ADD CONSTRAINT "FK_ea74d4cc98918a8d8fa20fc2fae" FOREIGN KEY ("sender_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "conversation" ADD CONSTRAINT "FK_fd317a9ea4334687bd85af18636" FOREIGN KEY ("receiver_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<any> {
+        await queryRunner.query(`ALTER TABLE "conversation" DROP CONSTRAINT "FK_fd317a9ea4334687bd85af18636"`);
+        await queryRunner.query(`ALTER TABLE "conversation" DROP CONSTRAINT "FK_ea74d4cc98918a8d8fa20fc2fae"`);
+        await queryRunner.query(`ALTER TABLE "message" DROP CONSTRAINT "FK_7fe3e887d78498d9c9813375ce2"`);
+        await queryRunner.query(`ALTER TABLE "message" DROP CONSTRAINT "FK_c0ab99d9dfc61172871277b52f6"`);
         await queryRunner.query(`ALTER TABLE "answer" DROP CONSTRAINT "FK_c3ebb08f68fdace3de1f5d51d2a"`);
         await queryRunner.query(`ALTER TABLE "answer" DROP CONSTRAINT "FK_add8ab72aec4ce5eb87fdc2740d"`);
         await queryRunner.query(`ALTER TABLE "calorie" DROP CONSTRAINT "FK_842f2b31ce92d176de532ff1268"`);
@@ -48,6 +58,8 @@ export class carelery1652186766927 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "like" DROP CONSTRAINT "FK_d41caa70371e578e2a4791a88ae"`);
         await queryRunner.query(`ALTER TABLE "friendship" DROP CONSTRAINT "FK_8cced01afb7c006b9643aed97bf"`);
         await queryRunner.query(`ALTER TABLE "friendship" DROP CONSTRAINT "FK_86463167c10dc37dbf9d39728bd"`);
+        await queryRunner.query(`DROP TABLE "conversation"`);
+        await queryRunner.query(`DROP TABLE "message"`);
         await queryRunner.query(`DROP TABLE "answer"`);
         await queryRunner.query(`DROP INDEX "IDX_d34106f8ec1ebaf66f4f8609dd"`);
         await queryRunner.query(`DROP TABLE "user"`);
