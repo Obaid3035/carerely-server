@@ -47,7 +47,7 @@ class App {
     new EventHandler(
       new Server(server, {
         cors: {
-          origin: "http://localhost:3000",
+          origin: "https://carerely-client.herokuapp.com",
         },
       })
     );
