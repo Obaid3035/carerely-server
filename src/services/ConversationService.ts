@@ -23,11 +23,15 @@ class ConversationService {
 
 
     console.log(conversation)
-    // @ts-ignore
-    const allUnseenMessages = conversation.reduce((acc: any, curVal: any) => {
-      return +curVal.unseen_count + +acc.unseen_count
-    }, { unseen_count: 0})
-    console.log(allUnseenMessages)
+
+    let allUnseenMessages = 0
+
+    if (conversation.length > 0) {
+      // @ts-ignore
+      allUnseenMessages = conversation.reduce((acc: any, curVal: any) => {
+        return +curVal.unseen_count + +acc.unseen_count
+      }, { unseen_count: 0})
+    }
 
     return {
       conversation,
