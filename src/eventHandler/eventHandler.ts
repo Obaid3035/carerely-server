@@ -37,7 +37,7 @@ class EventHandler {
 
     socket.on("new message", (newMessageReceived: Message) => {
       if (newMessageReceived.conversation.sender_id == newMessageReceived.sender_id) {
-        console.log("RECEIVER")
+        console.log(newMessageReceived.conversation.receiver_id)
         socket.in(newMessageReceived.conversation.receiver_id.toString()).emit("message received", newMessageReceived)
       }
       if (newMessageReceived.conversation.receiver_id == newMessageReceived.sender_id) {

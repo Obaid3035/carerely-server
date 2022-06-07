@@ -12,7 +12,23 @@ class ConversationController implements IController {
   constructor() {
     this.router
       .get(`${this.path}`, auth(UserRole.USER), this.index)
-      .post(`${this.path}/:id`, auth(UserRole.USER), this.create);
+      .post(`${this.path}/:id`, auth(UserRole.USER), this.create)
+      .get(`${this.path}/unseen`, auth(UserRole.USER), this.unSeenMessages);
+  }
+
+  private unSeenMessages = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = (req as IRequest).user;
+      const conversationInstance = Container.get(ConversationService);
+      const conversation = await conversationInstance.unSeenMessages(user);
+      res.status(200).json(conversation)
+    } catch (e) {
+      next(e);
+    }
   }
 
   private index = async (

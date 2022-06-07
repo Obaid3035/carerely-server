@@ -7,6 +7,30 @@ import User from "../entities/User";
 @Service()
 class MessageService {
 
+  async update(messageId: number) {
+    const message = await Message.findOne({
+      where: {
+        id: messageId
+      }
+    })
+
+    if (!message) {
+      throw new NotFound("No Message Found")
+    }
+
+    if (message.seen) {
+      return {
+        message: "Message already seen"
+      }
+    }
+
+    message.seen = true
+    await message.save()
+    return {
+      message: "Message updated successfully!"
+    }
+  }
+
 
   async index(currentUser: User, conversationId: number) {
     const conversation = await Conversation.findOne({
@@ -42,6 +66,18 @@ class MessageService {
       .orderBy("message.created_at", "ASC")
       .getMany()
 
+
+    await Message.createQueryBuilder("message")
+      .update(Message)
+      .set({
+        seen: true
+      })
+      .where("message.conversation_id = :conversation_id", { conversation_id: conversation.id})
+      .andWhere("message.sender_id != :sender_id", { sender_id: currentUser.id})
+      .andWhere("message.seen = :seen", { seen: false})
+      .execute()
+
+
     return {
       message,
       user
@@ -65,12 +101,12 @@ class MessageService {
       sender: currentUser
     });
 
-    // conversation.latest_message = userInput.content;
+    conversation.latest_message = userInput.content;
 
-    const message = await messageInstance.save();
-    // const conversationPromise = conversation.save();
+    const messagePromise = messageInstance.save();
+    const conversationPromise = conversation.save();
 
-    // const [message] = await Promise.all([messagePromise, conversationPromise]);
+    const [message] = await Promise.all([messagePromise, conversationPromise]);
 
     return message
   }

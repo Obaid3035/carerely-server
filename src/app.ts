@@ -47,7 +47,7 @@ class App {
     new EventHandler(
       new Server(server, {
         cors: {
-          origin: "https://carerely-client.herokuapp.com",
+          origin: process.env.CLIENT,
         },
       })
     );
@@ -78,3 +78,28 @@ class App {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -14,6 +14,24 @@ class MessageController implements IController {
     this.router
       .get(`${this.path}/:id`, auth(UserRole.USER), this.index)
       .post(`${this.path}/:id`, auth(UserRole.USER), this.create)
+      .put(`${this.path}/:id`, auth(UserRole.USER), this.update)
+  }
+
+
+
+
+  private update = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const messageServiceInstance = Container.get(MessageService);
+      const message = await messageServiceInstance.update(parseInt(req.params.id))
+      res.status(201).json(message);
+    } catch (e) {
+      next(e);
+    }
   }
 
 

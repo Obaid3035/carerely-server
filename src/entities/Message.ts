@@ -22,6 +22,12 @@ class Message extends BaseEntity {
   })
   content: string
 
+  @Column("boolean", {
+    nullable: false,
+    default: false
+  })
+  seen: boolean
+
   @ManyToOne(() => User, (user) => user.sender, {
     nullable: false
   })
