@@ -22,20 +22,24 @@ class ConversationService {
       .getMany();
 
 
-    console.log(conversation)
-
-    let allUnseenMessages = 0
+    let allUnseenMessages = {
+      unseen_count: 0
+    }
 
     if (conversation.length > 0) {
       // @ts-ignore
       allUnseenMessages = conversation.reduce((acc: any, curVal: any) => {
-        return +curVal.unseen_count + +acc.unseen_count
-      }, { unseen_count: 0})
+        return {
+          unseen_count: parseInt(curVal.unseen_count) + parseInt(acc.unseen_count)
+        }
+      }, {
+        unseen_count: 0
+      })
     }
 
     return {
       conversation,
-      allUnseenMessages
+      allUnseenMessages: allUnseenMessages.unseen_count
     };
 
   }
