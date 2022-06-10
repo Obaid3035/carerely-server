@@ -139,12 +139,13 @@ class UserService{
       .getRawMany()
 
     const mostFollowedUserIds = mostFollowers.map((friendship) => friendship.receiver_id);
-
-
-    return await User.createQueryBuilder("user")
-      .select(["user.id", "user.user_name", "user.image"])
-      .where("user.id IN(:...receiver_id)", { receiver_id: mostFollowedUserIds })
-      .getMany()
+    if (mostFollowedUserIds.length > 0) {
+      return await User.createQueryBuilder("user")
+        .select(["user.id", "user.user_name", "user.image"])
+        .where("user.id IN(:...receiver_id)", { receiver_id: mostFollowedUserIds })
+        .getMany()
+    }
+    return []
   }
 }
 
