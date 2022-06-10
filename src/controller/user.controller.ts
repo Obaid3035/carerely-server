@@ -4,6 +4,7 @@ import { Container } from "typedi";
 import UserService from "../services/UserService";
 import auth from "../middleware/auth";
 import User, { UserRole } from "../entities/User";
+import upload from "../middleware/multer";
 
 class UserController implements IController {
   path: string = "/auth";
@@ -14,12 +15,29 @@ class UserController implements IController {
     this.router
       .post(`${this.path}/register`, this.register)
       .post(`${this.path}/login`, this.login)
+      .put(`${this.path}/upload`,  auth(UserRole.USER), upload.single("image") ,this.profilePictureUpload)
       .get(`${this.path}/authorize/:token`, this.authorize)
       .get(`${this.path}/users`, this.searchUsers)
       .get(`${this.path}/top`, auth(UserRole.USER), this.mostFollowedUser)
       .get(`${this.path}/stats/:id`, auth(UserRole.USER), this.getUserStats)
       .get(`${this.path}/current-user/stats`, auth(UserRole.USER), this.getCurrentUserStats)
   }
+
+  private profilePictureUpload = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = (req as IRequest).user;
+      const userServiceInstance = Container.get(UserService);
+      const users = await userServiceInstance.profilePictureUpload(user, req.file)
+      res.status(200).json(users);
+    } catch (e) {
+      console.log(e);
+      next(e);
+    }
+  };
 
   private searchUsers = async (
     req: Request,
@@ -75,7 +93,6 @@ class UserController implements IController {
       await User.authorize(token);
       res.status(200).json({ authenticate: true });
     } catch (e) {
-      console.log(e);
       next(e);
     }
   };

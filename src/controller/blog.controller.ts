@@ -12,6 +12,7 @@ class BlogController implements IController{
   constructor() {
     this.router
       .get(`${this.path}`, auth(UserRole.USER), this.index)
+      .get(`${this.path}/few`, auth(UserRole.USER), this.getFewBlogs)
       .get(`${this.path}/:id`, auth(UserRole.USER), this.show)
 
   }
@@ -24,6 +25,20 @@ class BlogController implements IController{
     try {
       const blogServiceInstance = Container.get(BlogService);
       const blog = await blogServiceInstance.index();
+      res.status(200).json(blog);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  private getFewBlogs = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const blogServiceInstance = Container.get(BlogService);
+      const blog = await blogServiceInstance.getFewBlogs();
       res.status(200).json(blog);
     } catch (e) {
       next(e);

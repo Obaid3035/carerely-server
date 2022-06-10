@@ -86,6 +86,14 @@ class User extends BaseEntity {
   })
   profile_setup: boolean;
 
+  @Column("simple-json", {
+    nullable: true
+  })
+  image: {
+    avatar: string;
+    cloudinary_id: string;
+  };
+
   @OneToMany(() => FriendShip, (friendShip) => friendShip.sender)
   sender: FriendShip[];
 

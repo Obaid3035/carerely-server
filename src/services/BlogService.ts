@@ -20,6 +20,16 @@ class BlogService {
     }
   }
 
+
+  async getFewBlogs() {
+    const blogs = await Blog.createQueryBuilder("blog")
+      .where("blog.is_featured = :is_featured", {is_featured: true})
+      .take(3)
+      .getMany()
+
+    return blogs
+  }
+
   async show(blogId: number) {
     const blog = await Blog.findOne({
       where: {

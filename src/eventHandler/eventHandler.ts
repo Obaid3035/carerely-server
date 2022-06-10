@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io'
 import User from "../entities/User";
 import Message from "../entities/Message";
+import Notification from "../entities/Notification";
 
 class EventHandler {
   private io: Server;
@@ -24,9 +25,14 @@ class EventHandler {
       socket.emit("connected")
     })
 
+    socket.on("send notification", (notification: Notification) => {
+      if (notification) {
+        socket.in(notification.receiver_id.toString()).emit("notification received", notification)
+      }
+    })
+
     socket.on("join chat", (conversationId: number) => {
       socket.join(conversationId.toString())
-      console.log("User Joined Room: " + conversationId)
     })
     this.messageTransmission(socket)
   }
@@ -37,11 +43,9 @@ class EventHandler {
 
     socket.on("new message", (newMessageReceived: Message) => {
       if (newMessageReceived.conversation.sender_id == newMessageReceived.sender_id) {
-        console.log(newMessageReceived.conversation.receiver_id)
         socket.in(newMessageReceived.conversation.receiver_id.toString()).emit("message received", newMessageReceived)
       }
       if (newMessageReceived.conversation.receiver_id == newMessageReceived.sender_id) {
-        console.log(newMessageReceived.conversation.sender_id)
         socket.in(newMessageReceived.conversation.sender_id.toString()).emit("message received", newMessageReceived)
       }
     })

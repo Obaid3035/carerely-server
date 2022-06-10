@@ -3,6 +3,7 @@ import { Service } from "typedi";
 import FriendShip  from "../entities/FriendShip";
 import User from "../entities/User";
 import { NotFound } from "../utils/errorCode";
+import Notification, { NotificationStatus } from "../entities/Notification";
 
 @Service()
 class FriendShipService {
@@ -56,8 +57,10 @@ class FriendShipService {
     await friendShip.save();
 
     console.log("*********** FriendShip Created Successfully *************");
+    const notification = await Notification.createNotification(sender, receiver, NotificationStatus.Follow, null)
     return {
-      friendship: true
+      friendship: true,
+      notification
     };
   }
 

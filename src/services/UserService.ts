@@ -3,9 +3,28 @@ import User, { UserRole } from "../entities/User";
 // import BaseService from "./base.service";
 import FriendShip  from "../entities/FriendShip";
 import Post from "../entities/Post";
+import cloudinary from "../utils/cloudinary";
 
 @Service()
 class UserService{
+
+  async profilePictureUpload(currentUser: User, img: any) {
+    if (currentUser && currentUser.image) {
+      await cloudinary.v2.uploader.destroy(currentUser.image.cloudinary_id);
+    }
+
+    const uploadedImage = await cloudinary.v2.uploader.upload(img.path);
+    currentUser.image = {
+      avatar: uploadedImage.secure_url,
+      cloudinary_id: uploadedImage.public_id
+    }
+    await currentUser.save();
+    return {
+      message: 'Profile picture uploaded!',
+      token: currentUser.generateToken()
+    }
+  }
+
   async searchUsers(search: any) {
     return await User.createQueryBuilder("user")
       .where("user.user_name like :search", {search: `${search}%`})
@@ -123,7 +142,7 @@ class UserService{
 
 
     return await User.createQueryBuilder("user")
-      .select(["user.id", "user.user_name"])
+      .select(["user.id", "user.user_name", "user.image"])
       .where("user.id IN(:...receiver_id)", { receiver_id: mostFollowedUserIds })
       .getMany()
   }

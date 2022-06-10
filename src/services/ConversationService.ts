@@ -9,7 +9,7 @@ class ConversationService {
 
   async unSeenMessages(currUser: User) {
     const conversation = await Conversation.createQueryBuilder("conversation")
-      .select(["conversation", "sender.id", "sender.user_name", "receiver.id", "receiver.user_name"])
+      .select(["conversation", "sender.id", "sender.user_name", "sender.image", "receiver.id", "receiver.user_name", "receiver.image"])
       .where("conversation.sender_id = :sender_id", { sender_id: currUser.id})
       .orWhere("conversation.receiver_id = :receiver_id", { receiver_id: currUser.id})
       .innerJoin("conversation.sender", "sender")
@@ -46,7 +46,7 @@ class ConversationService {
 
   async index(currUser: User, search: any) {
     const conversation = await Conversation.createQueryBuilder("conversation")
-      .select(["conversation", "sender.id", "sender.user_name", "receiver.id", "receiver.user_name"])
+      .select(["conversation", "sender.id", "sender.user_name",  "sender.image", "receiver.id", "receiver.user_name", "receiver.image"])
       .where("conversation.sender_id = :sender_id", { sender_id: currUser.id})
       .orWhere("conversation.receiver_id = :receiver_id", { receiver_id: currUser.id})
       .innerJoin("conversation.sender", "sender")
@@ -57,9 +57,9 @@ class ConversationService {
 
     if (search && search.length > 0) {
       let searchedConversation = conversation.filter((conversation: Conversation) => {
-        if (conversation.sender.id !== currUser.id && conversation.sender.user_name.includes(search)) {
+        if (conversation.sender.id !== currUser.id && conversation.sender.user_name.toString().includes(search.toString())) {
           return true
-        } else if (conversation.receiver.id !== currUser.id && conversation.receiver.user_name.includes(search)) {
+        } else if (conversation.receiver.id !== currUser.id && conversation.receiver.user_name.toString().includes(search.toString())) {
           return true
         }
         return false

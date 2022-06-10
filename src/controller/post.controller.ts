@@ -31,6 +31,7 @@ class PostController implements IController {
       const posts = await postInstance.delete(parseInt(postId));
       res.status(StatusCodes.OK).json(posts);
     } catch (e) {
+      console.log(e);
       next(e);
     }
   }
@@ -52,7 +53,7 @@ class PostController implements IController {
       const pageNo = parseInt(<string>req.query.page);
       const size = parseInt(<string>req.query.size);
       const postInstance = Container.get(PostService);
-      const posts = await postInstance.getTrendingPost(size * pageNo, size);
+      const posts = await postInstance.getTrendingPost((req as IRequest).user, size * pageNo, size);
       res.status(StatusCodes.OK).json(posts);
     } catch (e) {
       next(e);

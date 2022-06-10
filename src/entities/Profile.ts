@@ -23,11 +23,11 @@ class Profile extends BaseEntity {
   @Column("date")
   dob: Date;
 
-  @Column("float")
-  height: number;
+  @Column("int")
+  height_feet: number;
 
-  @Column("varchar")
-  height_unit: string;
+  @Column("int")
+  height_inches: string;
 
   @Column("float")
   weight: number;

@@ -16,7 +16,9 @@ class Like extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Post, (post) => post.like)
+  @ManyToOne(() => Post, (post) => post.like, {
+    onDelete: "CASCADE"
+  })
   @JoinColumn({
     name: "post_id",
   })

@@ -49,6 +49,8 @@ class App {
         cors: {
           origin: process.env.CLIENT,
         },
+        pingTimeout: 20000,
+        pingInterval: 20000
       })
     );
   }

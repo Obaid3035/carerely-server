@@ -91,8 +91,6 @@ class CalorieService {
   }
 
   async create(userInput: any, curUser: User) {
-    console.log(userInput)
-    console.log()
     const calorie = await Calorie.create({
       mealType: userInput.mealType,
       calorie: userInput.calorie.value,

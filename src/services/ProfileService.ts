@@ -12,8 +12,8 @@ class ProfileService {
     const profile = Profile.create({
       dob: userInput.dob,
       gender: userInput.gender,
-      height: userInput.height,
-      height_unit: userInput.height_unit,
+      height_feet: userInput.height_feet,
+      height_inches: userInput.height_inches,
       weight: userInput.weight,
       weight_unit: userInput.weight_unit,
       user: currUser
@@ -40,18 +40,20 @@ class ProfileService {
   }
 
   async update(currUserId: number, userInput: Profile) {
-    console.log(userInput, currUserId);
-    const profile = await Profile.update(currUserId, {
-      dob: userInput.dob,
-      weight: userInput.weight,
-      weight_unit: userInput.weight_unit,
-      height: userInput.height,
-      height_unit: userInput.height_unit
-    });
-    if (!profile) {
-      throw new BadRequest("Profile cannot be updated")
-    }
-    console.log(profile)
+    await Profile.createQueryBuilder("profile")
+      .update({
+        dob: userInput.dob,
+        weight: userInput.weight,
+        weight_unit: userInput.weight_unit,
+        height_feet: userInput.height_feet,
+        height_inches: userInput.height_inches
+      })
+      .where({
+        user_id: currUserId,
+      })
+      .execute()
+
+
     return {
       updated: true,
     };

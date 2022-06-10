@@ -36,6 +36,7 @@ class QueriesService {
         "answers.text",
         "user.id",
         "user.user_name",
+        "user.image",
       ])
       .where("answers.id = :id", { id: answer.id })
       .innerJoin("answers.user", "user")
@@ -51,6 +52,7 @@ class QueriesService {
         "queries.text",
         "user.id",
         "user.user_name",
+        "user.image",
       ])
       .where("queries.topic_id = :id", { id: topicId })
       .loadRelationCountAndMap("queries.answerCount", "queries.answer")
@@ -84,6 +86,7 @@ class QueriesService {
         "queries.text",
         "user.id",
         "user.user_name",
+        "user.image",
       ])
       .where("queries.id = :id", { id: queries.id })
       .loadRelationCountAndMap("queries.answerCount", "queries.answer")
@@ -107,6 +110,7 @@ class QueriesService {
         "answers.text",
         "user.id",
         "user.user_name",
+        "user.image",
       ])
       .where("answers.queries_id = :id", { id: queriesId })
       .innerJoin("answers.user", "user")

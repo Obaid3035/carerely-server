@@ -3,6 +3,7 @@ import User from "../entities/User";
 import Post from "../entities/Post";
 import { NotFound } from "../utils/errorCode";
 import Comment from "../entities/Comment";
+import Notification, { NotificationStatus } from "../entities/Notification";
 
 @Service()
 class CommentService {
@@ -42,18 +43,32 @@ class CommentService {
 
     await createdComment.save();
 
-    return await Comment.createQueryBuilder("comment")
+    const comment = await Comment.createQueryBuilder("comment")
       .select([
         "comment.id",
         "comment.post_id",
         "comment.text",
         "user.id",
         "user.user_name",
+        "user.image",
       ])
       .where("comment.id = :id", { id: createdComment.id })
       .innerJoin("comment.user", "user")
       .orderBy("comment.created_at", "ASC")
       .getOne();
+
+    if (post.user.id != currUser.id) {
+      const notification = await Notification.createNotification(currUser, post.user, NotificationStatus.Comment, postId)
+      return {
+        comment,
+        notification
+      }
+    }
+
+
+    return {
+      comment
+    }
   }
 }
 

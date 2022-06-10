@@ -22,6 +22,7 @@ class FriendShipController implements IController {
       .delete(`${this.path}/delete-friendship/:userId`, auth(UserRole.USER), this.deleteFriendShip);
   }
 
+
   private unFollowFriendship = async (
     req: Request,
     res: Response,
