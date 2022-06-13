@@ -52,9 +52,10 @@ class EventHandler {
   }
 
   private disconnect(socket: Socket) {
-    socket.off("setup", (currUser: User) => {
-      console.log("User disconnect")
+    socket.on("delete", (currUser: User) => {
+      console.log("User left the room", currUser.user_name)
       socket.leave(currUser.id.toString())
+      socket.disconnect()
     })
   }
 }
