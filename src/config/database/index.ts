@@ -10,6 +10,7 @@ const AppDataSource = new DataSource({
   migrations: [
     `dist/migrations/*{.ts,.js}`
   ],
+
   ssl: {
     rejectUnauthorized: false
   }
