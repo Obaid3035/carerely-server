@@ -1,6 +1,6 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class carelery1654866741257 implements MigrationInterface {
+export class carelery1655215157141 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<any> {
         await queryRunner.query(`CREATE TABLE "friendship" ("id" SERIAL NOT NULL, "sender_id" integer NOT NULL, "receiver_id" integer NOT NULL, CONSTRAINT "PK_dbd6fb568cd912c5140307075cc" PRIMARY KEY ("id"))`);
@@ -14,7 +14,7 @@ export class carelery1654866741257 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "blog" ("id" SERIAL NOT NULL, "title" character varying NOT NULL, "feature_image" text, "text" character varying NOT NULL, "is_featured" boolean NOT NULL, "user_id" integer NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_85c6532ad065a448e9de7638571" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "calorie" ("id" SERIAL NOT NULL, "mealType" character varying NOT NULL, "calorie" double precision NOT NULL, "carb" double precision NOT NULL, "protein" double precision NOT NULL, "fat" double precision NOT NULL, "sugar" double precision NOT NULL, "user_id" integer NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_f14f04d86252db9cfca7d0d1f30" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TYPE "user_role_enum" AS ENUM('user', 'admin')`);
-        await queryRunner.query(`CREATE TABLE "user" ("id" SERIAL NOT NULL, "user_name" character varying(25) NOT NULL, "email" character varying(50) NOT NULL, "password" character varying NOT NULL, "role" "user_role_enum" NOT NULL, "profile_setup" boolean NOT NULL DEFAULT false, "image" text, CONSTRAINT "UQ_e12875dfb3b1d92d7d7c5377e22" UNIQUE ("email"), CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "user" ("id" SERIAL NOT NULL, "user_name" character varying(25) NOT NULL, "email" character varying(50) NOT NULL, "password" character varying NOT NULL, "role" "user_role_enum" NOT NULL, "is_verified" boolean NOT NULL DEFAULT false, "profile_setup" boolean NOT NULL DEFAULT false, "image" text, CONSTRAINT "UQ_e12875dfb3b1d92d7d7c5377e22" UNIQUE ("email"), CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "IDX_d34106f8ec1ebaf66f4f8609dd" ON "user" ("user_name") `);
         await queryRunner.query(`CREATE TABLE "answer" ("id" SERIAL NOT NULL, "text" character varying NOT NULL, "user_id" integer NOT NULL, "queries_id" integer NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_9232db17b63fb1e94f97e5c224f" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "message" ("id" SERIAL NOT NULL, "content" character varying NOT NULL, "seen" boolean NOT NULL DEFAULT false, "sender_id" integer NOT NULL, "conversation_id" integer NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_ba01f0a3e0123651915008bc578" PRIMARY KEY ("id"))`);
