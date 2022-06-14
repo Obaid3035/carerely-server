@@ -51,7 +51,7 @@ class PostService {
 
 
     const postsPromise = await Post.createQueryBuilder("post")
-      .select(["post", "post_user.id", "post_user.user_name", "post_user.image"])
+      .select(["post", "post_user.id", "post_user.user_name", "post_user.image", "post_user.is_verified"])
       .where("post.user_id IN(:...user_id)", { user_id: validUserIds })
       .innerJoin("post.user", "post_user")
       .loadRelationCountAndMap("post.like_count", "post.like")
@@ -76,7 +76,7 @@ class PostService {
     };
 
     const comments = await Comment.createQueryBuilder("comment")
-      .select(["comment", "user.id", "user.user_name", "user.image"])
+      .select(["comment", "user.id", "user.user_name", "user.image", "user.is_verified"])
       .where("comment.post_id IN(:...post_id)", { post_id: postIds })
       .innerJoin("comment.user", "user")
       .orderBy("comment.created_at", "DESC")
@@ -109,7 +109,7 @@ class PostService {
     const mostLikedPostIds = mostLike.map((like) => like.post_id);
 
     const postsPromise =  Post.createQueryBuilder("post")
-      .select(["post", "user.id", "user.user_name", "user.image"])
+      .select(["post", "user.id", "user.user_name", "user.image", "user.is_verified"])
       .where("post.id IN(:...post_id)", { post_id: mostLikedPostIds })
       .loadRelationCountAndMap("post.like_count", "post.like", "count")
       .loadRelationCountAndMap("post.comment_count", "post.comment")
@@ -134,7 +134,7 @@ class PostService {
 
 
     const comments = await Comment.createQueryBuilder("comment")
-      .select(["comment", "user.id", "user.user_name", "user.image"])
+      .select(["comment", "user.id", "user.user_name", "user.image", "user.is_verified"])
       .where("comment.post_id IN(:...post_id)", { post_id: postIds })
       .innerJoin("comment.user", "user")
       .orderBy("comment.created_at", "DESC")
@@ -157,7 +157,7 @@ class PostService {
   async currentUserPost(user: User, skip: number, limit: number): Promise<any>  {
 
     const postsPromise = Post.createQueryBuilder("post")
-      .select(["post", "post_user.id", "post_user.user_name", "post_user.image"])
+      .select(["post", "post_user.id", "post_user.user_name", "post_user.image", "post_user.is_verified"])
       .where("post.user_id = :user_id", { user_id: user.id })
       .innerJoin("post.user", "post_user")
       .loadRelationCountAndMap("post.like_count", "post.like")
@@ -182,7 +182,7 @@ class PostService {
     }
 
     const comments = await Comment.createQueryBuilder("comment")
-      .select(["comment", "user.id", "user.user_name", "user.image"])
+      .select(["comment", "user.id", "user.user_name", "user.image", "user.is_verified"])
       .where("comment.post_id IN(:...post_id)", { post_id: postIds })
       .innerJoin("comment.user", "user")
       .orderBy("comment.created_at", "DESC")
@@ -202,7 +202,7 @@ class PostService {
 
   async show(postId: string, user: User) {
     const post: any = await Post.createQueryBuilder("post")
-      .select(["post", "post_user.id", "post_user.user_name", "post_user.image"])
+      .select(["post", "post_user.id", "post_user.user_name", "post_user.image", "post_user.is_verified"])
       .where("post.id = :postId", { postId: postId })
       .loadRelationCountAndMap("post.like_count", "post.like", "count")
       .loadRelationCountAndMap("post.comment_count", "post.comment")
@@ -214,7 +214,7 @@ class PostService {
     }
 
     const comments = await Comment.createQueryBuilder("comment")
-      .select(["comment", "user.id", "user.user_name", "user.image"])
+      .select(["comment", "user.id", "user.user_name", "user.image", "user.is_verified"])
       .where("comment.post_id = :post_id", { post_id: post.id })
       .innerJoin("comment.user", "user")
       .orderBy("comment.created_at", "ASC")
@@ -248,7 +248,7 @@ class PostService {
 
     if (mostLikedPostIds.length > 0) {
       const posts = await Post.createQueryBuilder("post")
-        .select(["post", "user.id", "user.user_name", "user.image"])
+        .select(["post", "user.id", "user.user_name", "user.image", "user.is_verified"])
         .where("post.id IN(:...post_id)", { post_id: mostLikedPostIds })
         .loadRelationCountAndMap("post.like_count", "post.like", "count")
         .loadRelationCountAndMap("post.comment_count", "post.comment")
@@ -292,7 +292,7 @@ class PostService {
     }
 
     const post: any = await Post.createQueryBuilder("post")
-      .select(["post", "post_user.id", "post_user.user_name", "post_user.image"])
+      .select(["post", "post_user.id", "post_user.user_name", "post_user.image", "post_user.is_verified"])
       .where("post.id = :postId", { postId: createdPost.id })
       .innerJoin("post.user", "post_user")
       .loadRelationCountAndMap("post.like_count", "post.like", "count")
@@ -349,7 +349,7 @@ class PostService {
       "************ Fetching all the post that other user ************"
     );
     const postsPromise = Post.createQueryBuilder("post")
-      .select(["post", "post_user.id", "post_user.user_name",  "post_user.image"])
+      .select(["post", "post_user.id", "post_user.user_name",  "post_user.image", "post_user.is_verified"])
       .where("post.user_id = :user_id", { user_id: otherUserId })
       .innerJoin("post.user", "post_user")
       .loadRelationCountAndMap("post.like_count", "post.like")

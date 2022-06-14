@@ -81,7 +81,7 @@ class UserService{
       where: {
         id: otherUserId,
       },
-      select: ["user_name"],
+      select: ["user_name", "is_verified"],
     });
     const [ postCount, followersCount, followingCount, otherUser] =
       await Promise.all([

@@ -86,6 +86,11 @@ class User extends BaseEntity {
   })
   profile_setup: boolean;
 
+  @Column("boolean", {
+    default: false,
+  })
+  is_verified: boolean;
+
   @Column("simple-json", {
     nullable: true
   })
