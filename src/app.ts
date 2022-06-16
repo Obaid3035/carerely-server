@@ -47,8 +47,8 @@ class App {
     new EventHandler(
       new Server(server, {
         cors: {
-          // origin: "https://careraly-server.herokuapp.com",
-          origin: process.env.CLIENT
+          origin: "https://careraly-server.herokuapp.com",
+          // origin: process.env.CLIENT
         },
         pingTimeout: 20000,
         pingInterval: 25000
