@@ -16,8 +16,8 @@ class CalorieController implements IController {
       .get(`${this.path}`, this.getFoodProducts)
       .post(`${this.path}`, auth(UserRole.USER), this.create)
       .get(`${this.path}/stats/:id`, auth(UserRole.USER), this.getFoodStats)
-      .get(`${this.path}/monthly`, auth(UserRole.USER), this.monthlyCalorie)
-
+      .get(`${this.path}/weekly`, auth(UserRole.USER), this.weeklyGraph)
+      .get(`${this.path}/monthly`, auth(UserRole.USER), this.monthlyGraph)
   }
 
   private getFoodProducts = async (
@@ -81,10 +81,20 @@ class CalorieController implements IController {
   }
 
 
-  private monthlyCalorie = async (_req: Request, res: Response, next: NextFunction) => {
+  private weeklyGraph = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const calorieServiceInstance = Container.get(CalorieService)
-      const foodProducts = await calorieServiceInstance.monthlyCalorie();
+      const foodProducts = await calorieServiceInstance.weeklyGraph(String(req.query.nutrient));
+      res.status(200).json(foodProducts);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  private monthlyGraph = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const calorieServiceInstance = Container.get(CalorieService)
+      const foodProducts = await calorieServiceInstance.monthlyGraph(String(req.query.nutrient));
       res.status(200).json(foodProducts);
     } catch (e) {
       next(e);

@@ -63,6 +63,7 @@ class CalorieService {
       return moment(calorie.created_at).format('dddd MMMM Do YYYY')
     })
 
+
     const historyArr = [];
 
 
@@ -78,16 +79,66 @@ class CalorieService {
     }
   }
 
-  async monthlyCalorie() {
-    const monthlySales = await Calorie.createQueryBuilder("calorie")
-      .where("calorie.created_at >= :after", { after: moment().utc(false).startOf('month').toDate()})
-      .andWhere("calorie.created_at < :before", { before: moment().utc(false).endOf('month').toDate(),})
-      .select("SUM(calorie.foodDetail.calorie)", "sum")
-      .groupBy("calorie.created_at")
-      .getMany()
+  async weeklyGraph(nutrient: string) {
+    let dayLimit = 6;
+    let currentDate = moment();
+    let weekStart = currentDate.clone().startOf('week');
+    let days = [];
+    for (let i = 0; i <= dayLimit; i++) {
+      days.push(moment(weekStart).add(i, 'days').format('YYYY-MM-DD'));
+    }
+
+    const weeklyRecord = await Calorie.createQueryBuilder("calorie")
+      .select([`calorie.${nutrient}`, "calorie.created_at"])
+      .where('calorie.created_at > :start_at', { start_at: moment().startOf("week") })
+      .getMany();
+
+    let mappedRecords: any = _(weeklyRecord).groupBy(v => moment(v.created_at).format('YYYY-MM-DD'))
+      .map((created_at, id) => ({
+        created_at: id,
+        [nutrient]: _.sumBy(created_at, nutrient),
+      }))
+      .value()
+    let mappedDays = days.map((date) => {
+      for (const sale of mappedRecords) {
+        if (date === sale.created_at) return sale[nutrient]
+        else return 0
+      }
+      return null
+    })
+    return mappedDays
+  }
 
 
-    return monthlySales
+  async monthlyGraph(nutrient: string) {
+    let dayLimit = 29;
+    let currentDate = moment();
+    let monthStart = currentDate.clone().startOf('month');
+    let days = [];
+    for (let i = 0; i <= dayLimit; i++) {
+      days.push(moment(monthStart).add(i, 'days').format('YYYY-MM-DD'));
+    }
+
+    const monthlyRecord = await Calorie.createQueryBuilder("calorie")
+      .select([`calorie.${nutrient}`, "calorie.created_at"])
+      .where('calorie.created_at > :start_at', { start_at: moment().startOf("month") })
+      .getMany();
+
+    let mappedRecords: any = _(monthlyRecord).groupBy(v => moment(v.created_at).format('YYYY-MM-DD'))
+      .map((created_at, id) => ({
+        created_at: id,
+        [nutrient]: _.sumBy(created_at, nutrient),
+      }))
+      .value()
+
+    let mappedDays = days.map((date) => {
+      for (const sale of mappedRecords) {
+        if (date === sale.created_at) return sale[nutrient]
+        else return 0
+      }
+      return null
+    })
+    return mappedDays
   }
 
   async create(userInput: any, curUser: User) {
