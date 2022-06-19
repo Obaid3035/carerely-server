@@ -43,6 +43,7 @@ class App {
     }
   }
 
+
   private static initializeSocket(server: http.Server) {
     new EventHandler(
       new Server(server, {
