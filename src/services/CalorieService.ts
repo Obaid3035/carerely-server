@@ -131,12 +131,13 @@ class CalorieService {
       }))
       .value()
 
+
+
     let mappedDays = days.map((date) => {
       for (const sale of mappedRecords) {
         if (date === sale.created_at) return sale[nutrient]
-        else return 0
       }
-      return null
+      return 0
     })
     return mappedDays
   }
