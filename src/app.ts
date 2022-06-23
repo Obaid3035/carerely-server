@@ -10,7 +10,6 @@ import {IController} from './interface';
 import handleError from './middleware/errorHandler';
 import EventHandler from "./eventHandler/eventHandler";
 
-
 class App {
   public app: Application;
 
