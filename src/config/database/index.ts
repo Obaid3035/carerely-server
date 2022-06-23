@@ -2,7 +2,7 @@ import { DataSource, DataSourceOptions } from "typeorm"
 
 let dbConfig: DataSourceOptions = {
   type: "postgres",
-  url: "postgres://obaidaqeel:password@localhost:5432/carerely_development",
+  url: process.env.DATABASE_URL,
   logging: false,
   synchronize: true,
   entities: [`src/entities/**/*{.ts,.js}`],
@@ -14,7 +14,7 @@ let dbConfig: DataSourceOptions = {
 if (process.env.NODE_ENV === 'production') {
   dbConfig = {
     type: "postgres",
-    url: "postgres://uzqpzlmypzkdkp:a4f94151ff2ecbe239f0962130b6753018636c553aa9e2c60a5c2f4baf46d7e3@ec2-23-20-224-166.compute-1.amazonaws.com:5432/dbu76ag6mhjmek",
+    url: process.env.DATABASE_URL,
     logging: false,
     synchronize: false,
     entities: [`dist/entities/**/*{.ts,.js}`],
@@ -27,6 +27,8 @@ if (process.env.NODE_ENV === 'production') {
     }
   }
 }
+
+console.log(dbConfig)
 
 const AppDataSource = new DataSource(dbConfig)
 
