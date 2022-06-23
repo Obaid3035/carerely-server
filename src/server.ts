@@ -30,5 +30,3 @@ new App([
   new MessageController(),
   new NotificationController()
 ]).bootstrap();
-
-

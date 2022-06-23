@@ -4,11 +4,12 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { Server} from "socket.io";
 import http from "http";
-//import rateLimit from 'express-rate-limit';
+import rateLimit from 'express-rate-limit';
 import AppDataSource from "./config/database";
 import {IController} from './interface';
 import handleError from './middleware/errorHandler';
 import EventHandler from "./eventHandler/eventHandler";
+
 
 class App {
   public app: Application;
@@ -22,7 +23,6 @@ class App {
 
   public async bootstrap() {
     try {
-      // const connection = await createConnection(process.env.CONNECTION_NAME);
       AppDataSource.initialize()
         .then(() => {
           console.log("Data Source has been initialized!");
@@ -34,10 +34,6 @@ class App {
         .catch((err) => {
           console.error("Error during Data Source initialization", err);
         });
-      // if (connection.isConnected) {
-      //   console.log("Database connection established")
-      //
-      // }
     } catch (e) {
       console.log(e);
     }
@@ -48,8 +44,7 @@ class App {
     new EventHandler(
       new Server(server, {
         cors: {
-          origin: "https://carerely-client.herokuapp.com",
-          // origin: process.env.CLIENT
+          origin: process.env.CLIENT
         },
         pingTimeout: 20000,
         pingInterval: 25000
@@ -60,12 +55,12 @@ class App {
   private initializeMiddleware() {
     this.app.use(cors());
     this.app.use(helmet());
-    // this.app.use(
-    //     rateLimit({
-    //       windowMs: 15 * 60 * 1000,
-    //       max: 100,
-    //     }),
-    // );
+    this.app.use(
+        rateLimit({
+          windowMs: 15 * 60 * 1000,
+          max: 500,
+        }),
+    );
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
   }

@@ -4,8 +4,6 @@ import { Container } from "typedi";
 import UserService from "../../services/admin/UserService";
 import { UserRole } from "../../entities/User";
 import auth from "../../middleware/auth";
-// import { Container } from "typedi";
-// import UserService from "../../services/UserService";
 
 class AdminUserController implements IController {
   path: string = "/admin";
