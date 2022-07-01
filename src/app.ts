@@ -43,7 +43,7 @@ class App {
     new EventHandler(
       new Server(server, {
         cors: {
-          origin: process.env.CLIENT
+          origin: "*"
         },
         pingTimeout: 20000,
         pingInterval: 25000
