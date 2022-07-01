@@ -6,7 +6,7 @@ import Notification  from "../entities/Notification";
 class NotificationService {
   async index(currentUser: User) {
 
-    const notification= await Notification.createQueryBuilder("notification")
+    const notificationPromise = Notification.createQueryBuilder("notification")
       .select(["notification", "sender.id", "sender.user_name", "sender.image", "receiver.id", "receiver.user_name", "receiver.image"])
       .where("notification.receiver_id = :receiver_id", {receiver_id: currentUser.id})
       .innerJoin("notification.sender", "sender")
@@ -15,7 +15,16 @@ class NotificationService {
       .take(3)
       .getMany()
 
-    return notification
+    const notificationCountPromise = Notification.createQueryBuilder("notification")
+      .where("notification.receiver_id = :receiver_id", {receiver_id: currentUser.id})
+      .getCount()
+
+    const [notification, notificationCount] = await Promise.all([notificationPromise, notificationCountPromise])
+
+    return {
+      notification,
+      notificationCount
+    }
 
   }
 }
