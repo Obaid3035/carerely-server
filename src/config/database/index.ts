@@ -21,14 +21,11 @@ if (process.env.NODE_ENV === 'production') {
     migrations: [
       `dist/migrations/*{.ts,.js}`
     ],
-
     ssl: {
       rejectUnauthorized: false
     }
   }
 }
-
-console.log(dbConfig)
 
 const AppDataSource = new DataSource(dbConfig)
 

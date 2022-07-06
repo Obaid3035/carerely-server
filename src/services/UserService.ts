@@ -4,9 +4,48 @@ import User, { UserRole } from "../entities/User";
 import FriendShip  from "../entities/FriendShip";
 import Post from "../entities/Post";
 import cloudinary from "../utils/cloudinary";
+import bcrypt from "bcrypt";
+import BadRequest from "../utils/errorCode";
+import { emailConfirmationMail, reportMail } from "../utils/emailService/emails";
 
 @Service()
 class UserService{
+
+  async sendReport(user: User, report: string) {
+    await reportMail(user.email, report)
+    return {
+      message: "Report sent successfully"
+    }
+  }
+
+  async changeEmail(user: User, email: string) {
+    user.email = email;
+    await user.save();
+    return {
+      message: "Email changed successfully!"
+    }
+  }
+
+  async verifyEmail(user: User, email: string) {
+    const token: string = user.generateToken();
+    const emailSent = await emailConfirmationMail(email, token);
+    if (!emailSent) {
+      throw new Error("An Error has occurred")
+    }
+    return {
+      message: "You have received an email with instructions"
+    }
+  }
+
+  async changePassword(currentUser: User, oldPassword: string, newPassword: string) {
+    const isMatch: boolean = await bcrypt.compare(oldPassword, currentUser.password);
+    if (!isMatch) throw new BadRequest('password is incorrect');
+    currentUser.password = await bcrypt.hash(newPassword, 10);
+    await currentUser.save();
+    return {
+      message: "Password changed successfully!"
+    }
+  }
 
   async profilePictureUpload(currentUser: User, img: any) {
     if (currentUser && currentUser.image) {

@@ -21,6 +21,72 @@ class UserController implements IController {
       .get(`${this.path}/top`, auth(UserRole.USER), this.mostFollowedUser)
       .get(`${this.path}/stats/:id`, auth(UserRole.USER), this.getUserStats)
       .get(`${this.path}/current-user/stats`, auth(UserRole.USER), this.getCurrentUserStats)
+      .put(`${this.path}/verify-email`, auth(UserRole.USER), this.verifyEmail)
+      .put(`${this.path}/change-email`, auth(UserRole.USER), this.changeEmail)
+      .put(`${this.path}/change-password`, auth(UserRole.USER), this.changePassword)
+      .put(`${this.path}/report`, auth(UserRole.USER), this.sendReport)
+  }
+
+
+  private sendReport = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = (req as IRequest).user;
+      const userServiceInstance = Container.get(UserService);
+      const users = await userServiceInstance.sendReport(user, req.body.report);
+      res.status(200).json(users);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  private changeEmail = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = (req as IRequest).user;
+      const userServiceInstance = Container.get(UserService);
+      const users = await userServiceInstance.changeEmail(user, req.body.email);
+      res.status(200).json(users);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+
+  private verifyEmail = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = (req as IRequest).user;
+      const userServiceInstance = Container.get(UserService);
+      const users = await userServiceInstance.verifyEmail(user, req.body.email);
+      res.status(200).json(users);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  private changePassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = (req as IRequest).user;
+      const userServiceInstance = Container.get(UserService);
+      const users = await userServiceInstance.changePassword(user, req.body.oldPassword, req.body.newPassword);
+      res.status(200).json(users);
+    } catch (e) {
+      next(e);
+    }
   }
 
   private profilePictureUpload = async (

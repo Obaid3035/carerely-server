@@ -19,7 +19,7 @@ class PostService {
     })
 
     if(!post) {
-      throw new NotFound("Post not found")
+      throw new NotFound("Posts not found")
     }
     if (post.image) {
       await cloudinary.v2.uploader.destroy(
@@ -28,7 +28,7 @@ class PostService {
     }
     await Post.delete(post.id)
     return {
-      message: "Post deleted successfully"
+      message: "Posts deleted successfully"
     }
   }
 
@@ -210,7 +210,7 @@ class PostService {
       .getOne();
 
     if (!post) {
-      return "No Post Found";
+      return "No Posts Found";
     }
 
     const comments = await Comment.createQueryBuilder("comment")
