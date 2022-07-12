@@ -53,7 +53,7 @@ class MessageService {
       })
     } else {
       user = await User.findOne({
-        select: ["id", "user_name"],
+        select: ["id", "user_name", "image"],
         where: {
           id: conversation.receiver_id
         }

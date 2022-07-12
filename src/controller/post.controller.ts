@@ -21,7 +21,7 @@ class PostController implements IController {
       .get(`${this.path}/user/:id`, auth(UserRole.USER), this.otherPost)
       .get(`${this.path}/current-user`, auth(UserRole.USER), this.currentUserPost)
       .get(`${this.path}/:id`, auth(UserRole.USER), this.show)
-      .delete(`${this.path}/:id`, auth(UserRole.USER), this.delete)
+      .delete(`${this.path}/:id`, auth(UserRole.USER), this.delete);
   }
 
   private delete = async (req: Request, res: Response, next: NextFunction) => {
@@ -34,7 +34,7 @@ class PostController implements IController {
       console.log(e);
       next(e);
     }
-  }
+  };
 
   private index = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -58,8 +58,7 @@ class PostController implements IController {
     } catch (e) {
       next(e);
     }
-  }
-
+  };
 
 
   private currentUserPost = async (req: Request, res: Response, next: NextFunction) => {
@@ -73,7 +72,7 @@ class PostController implements IController {
       console.log(e);
       next(e);
     }
-  }
+  };
 
 
   private show = async (req: Request, res: Response, next: NextFunction) => {
@@ -86,7 +85,7 @@ class PostController implements IController {
     } catch (e) {
       next(e);
     }
-  }
+  };
 
 
   private getFewTrendingPost = async (req: Request, res: Response, next: NextFunction) => {
@@ -99,13 +98,13 @@ class PostController implements IController {
       console.log(e);
       next(e);
     }
-  }
+  };
 
   private create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req as IRequest).user;
       const postInstance = Container.get(PostService);
-      const post  = await postInstance.create(req.body, user, req.file);
+      const post = await postInstance.create(req.body, user, req.file);
       res.status(StatusCodes.CREATED).json(post);
     } catch (e) {
       next(e);
@@ -115,16 +114,16 @@ class PostController implements IController {
   private otherPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req as IRequest).user;
-      const otherUserId = req.params.id
+      const otherUserId = req.params.id;
       const pageNo = parseInt(<string>req.query.page);
       const size = parseInt(<string>req.query.size);
       const postInstance = Container.get(PostService);
-      const posts  = await postInstance.otherPost(user, otherUserId, size * pageNo, size);
+      const posts = await postInstance.otherPost(user, otherUserId, size * pageNo, size);
       res.status(StatusCodes.OK).json(posts);
     } catch (e) {
       next(e);
     }
-  }
+  };
 }
 
 export default PostController;
