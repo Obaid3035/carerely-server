@@ -38,7 +38,9 @@ class Queries extends BaseEntity {
   @Column("int")
   topic_id: number;
 
-  @OneToMany(() => Answer, (answer) => answer.queries)
+  @OneToMany(() => Answer, (answer) => answer.queries, {
+    onDelete: "CASCADE"
+  })
   answer: Answer
 
   @CreateDateColumn()

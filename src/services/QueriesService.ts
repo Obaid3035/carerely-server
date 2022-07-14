@@ -1,5 +1,4 @@
 import { Service } from "typedi";
-// import BaseService from "./base.service";
 import Queries from "../entities/Queries";
 import Topic from "../entities/Topic";
 import NotFound from "../utils/errorCode";
@@ -7,6 +6,20 @@ import Answer from "../entities/Answer";
 
 @Service()
 class QueriesService {
+
+  async destroy(queryId: number) {
+    const query = await Queries.findOne({
+      where: {
+        id: queryId
+      }
+    })
+    if(!query) throw new NotFound("Posts not found")
+
+    await Queries.delete(query.id)
+    return {
+      message: "Query deleted successfully"
+    }
+  }
 
   async indexTopic() {
     const topic = await Topic.createQueryBuilder("topic")

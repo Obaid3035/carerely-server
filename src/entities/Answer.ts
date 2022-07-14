@@ -28,7 +28,9 @@ class Answer extends BaseEntity {
   @Column("int")
   user_id: number;
 
-  @ManyToOne(() => Queries, (queries) => queries.answer)
+  @ManyToOne(() => Queries, (queries) => queries.answer, {
+    onDelete: "CASCADE"
+  })
   @JoinColumn({
     name: "queries_id",
   })

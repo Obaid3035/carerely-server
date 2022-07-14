@@ -12,6 +12,7 @@ class UserService {
       .getMany();
 
     const userCountPromise = User.createQueryBuilder("user")
+      .where("user.role != :role", { role: "admin"})
       .getCount()
 
     const [user, userCount] = await Promise.all([userPromise, userCountPromise]);

@@ -20,6 +20,17 @@ class QueriesController implements IController{
       .post(`${this.path}/answer/:id`, auth(UserRole.USER), this.createAnswer)
       .get(`${this.path}/:id`, auth(UserRole.USER), this.index)
       .post(`${this.path}/:id`, auth(UserRole.USER), this.create)
+      .delete(`${this.path}/:id`, auth(UserRole.USER), this.destroy)
+  }
+
+  private destroy = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const queriesServiceInstance = Container.get(QueriesService);
+      const queries  = await queriesServiceInstance.destroy(+req.params.id)
+      res.status(StatusCodes.OK).json(queries)
+    } catch (e)  {
+      next(e);
+    }
   }
 
   private indexTopic = async (_req: Request, res: Response, next: NextFunction) => {
