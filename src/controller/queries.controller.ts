@@ -81,9 +81,9 @@ class QueriesController implements IController{
 
   private index = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const topicId = req.params.id
+      const topicName = req.params.id
       const queriesServiceInstance = Container.get(QueriesService);
-      const topic  = await queriesServiceInstance.index(topicId)
+      const topic  = await queriesServiceInstance.index(topicName)
       res.status(StatusCodes.OK).json(topic)
     } catch (e) {
       next(e);
@@ -92,10 +92,10 @@ class QueriesController implements IController{
 
   private create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const topicId = req.params.id
+      const topicName = req.params.id
       const user = (req as IRequest).user;
       const queriesServiceInstance = Container.get(QueriesService);
-      const topic  = await queriesServiceInstance.create(parseInt(topicId), user.id, req.body)
+      const topic  = await queriesServiceInstance.create(topicName, user.id, req.body)
       res.status(StatusCodes.CREATED).json(topic)
     } catch (e) {
       next(e);

@@ -4,7 +4,7 @@ let dbConfig: DataSourceOptions = {
   type: "postgres",
   url: process.env.DATABASE_URL,
   logging: false,
-  synchronize: true,
+  synchronize: false,
   entities: [`src/entities/**/*{.ts,.js}`],
   migrations: [
     `src/migrations/*{.ts,.js}`
@@ -14,7 +14,12 @@ let dbConfig: DataSourceOptions = {
 if (process.env.NODE_ENV === 'production') {
   dbConfig = {
     type: "postgres",
-    url: process.env.DATABASE_URL,
+    name: "db-postgresql-carerely-nyc3-82257",
+    username: "doadmin",
+    password: "AVNS_oPA6FncjNZYt04sa6TG",
+    host: "db-postgresql-carerely-nyc3-82257-do-user-11810815-0.b.db.ondigitalocean.com",
+    port: 25060,
+    database: "defaultdb",
     logging: false,
     synchronize: false,
     entities: [`dist/entities/**/*{.ts,.js}`],
