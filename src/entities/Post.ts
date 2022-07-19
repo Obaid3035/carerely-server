@@ -67,6 +67,11 @@ class Post extends BaseEntity {
   @Column("int")
   user_id: number;
 
+  @Column("int", {
+    default: 0
+  })
+  like_count: number;
+
   @OneToMany(() => Like, (like) => like.post, {
     nullable: true,
     onDelete: "CASCADE"

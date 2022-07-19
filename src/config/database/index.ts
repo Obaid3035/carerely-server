@@ -4,7 +4,7 @@ let dbConfig: DataSourceOptions = {
   type: "postgres",
   url: process.env.DATABASE_URL,
   logging: false,
-  synchronize: false,
+  synchronize: true,
   entities: [`src/entities/**/*{.ts,.js}`],
   migrations: [
     `src/migrations/*{.ts,.js}`

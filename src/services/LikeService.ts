@@ -7,11 +7,11 @@ import Notification, { NotificationStatus } from "../entities/Notification";
 
 @Service()
 class LikeService {
-  async  create(currUser: User, postId: number) {
+  async create(currUser: User, postId: number) {
     const post: Post = await Post.findOne({
       where: {
-        id: postId
-      }
+        id: postId,
+      },
     });
     if (!post) {
       throw new NotFound("User not found");
@@ -25,9 +25,12 @@ class LikeService {
     });
 
     if (foundLike) {
-      await Like.delete({
-        id: foundLike.id
+      post.like_count -= 1;
+      const savedPostPromise = post.save();
+      const likedPostPromise = Like.delete({
+        id: foundLike.id,
       });
+      await Promise.all([savedPostPromise, likedPostPromise]);
       return {
         liked: false,
       };
@@ -37,14 +40,22 @@ class LikeService {
       user: currUser,
       post: post,
     });
-    await like.save();
-   if (post.user.id != currUser.id) {
-     const notification = await Notification.createNotification(currUser, post.user, NotificationStatus.Like, post.id)
-     return {
-       liked: true,
-       notification
-     };
-   }
+    post.like_count += 1;
+    const savedPostPromise = post.save();
+    const savedLike = like.save();
+    await Promise.all([savedPostPromise, savedLike]);
+    if (post.user.id != currUser.id) {
+      const notification = await Notification.createNotification(
+        currUser,
+        post.user,
+        NotificationStatus.Like,
+        post.id
+      );
+      return {
+        liked: true,
+        notification,
+      };
+    }
 
     return {
       liked: true,
