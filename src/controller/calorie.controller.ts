@@ -83,8 +83,9 @@ class CalorieController implements IController {
 
   private weeklyGraph = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const currentUser = (req as IRequest).user;
       const calorieServiceInstance = Container.get(CalorieService)
-      const foodProducts = await calorieServiceInstance.weeklyGraph(String(req.query.nutrient));
+      const foodProducts = await calorieServiceInstance.weeklyGraph(String(req.query.nutrient), currentUser.id);
       res.status(200).json(foodProducts);
     } catch (e) {
       next(e);
@@ -93,8 +94,9 @@ class CalorieController implements IController {
 
   private monthlyGraph = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const currentUser = (req as IRequest).user;
       const calorieServiceInstance = Container.get(CalorieService)
-      const foodProducts = await calorieServiceInstance.monthlyGraph(String(req.query.nutrient));
+      const foodProducts = await calorieServiceInstance.monthlyGraph(String(req.query.nutrient), currentUser.id);
       res.status(200).json(foodProducts);
     } catch (e) {
       next(e);

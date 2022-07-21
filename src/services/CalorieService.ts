@@ -79,7 +79,7 @@ class CalorieService {
     }
   }
 
-  async weeklyGraph(nutrient: string) {
+  async weeklyGraph(nutrient: string, currentUser: number) {
     let dayLimit = 6;
     let currentDate = moment();
     let weekStart = currentDate.clone().startOf('week');
@@ -91,6 +91,7 @@ class CalorieService {
     const weeklyRecord = await Calorie.createQueryBuilder("calorie")
       .select([`calorie.${nutrient}`, "calorie.created_at"])
       .where('calorie.created_at > :start_at', { start_at: moment().startOf("week") })
+      .andWhere('calorie.user_id = :currentUser', {currentUser})
       .getMany();
 
     let mappedRecords: any = _(weeklyRecord).groupBy(v => moment(v.created_at).format('YYYY-MM-DD'))
@@ -109,7 +110,7 @@ class CalorieService {
   }
 
 
-  async monthlyGraph(nutrient: string) {
+  async monthlyGraph(nutrient: string, currentUser: number) {
     let dayLimit = 29;
     let currentDate = moment();
     let monthStart = currentDate.clone().startOf('month');
@@ -121,6 +122,7 @@ class CalorieService {
     const monthlyRecord = await Calorie.createQueryBuilder("calorie")
       .select([`calorie.${nutrient}`, "calorie.created_at"])
       .where('calorie.created_at > :start_at', { start_at: moment().startOf("month") })
+      .andWhere('calorie.user_id = :currentUser', {currentUser})
       .getMany();
 
     let mappedRecords: any = _(monthlyRecord).groupBy(v => moment(v.created_at).format('YYYY-MM-DD'))

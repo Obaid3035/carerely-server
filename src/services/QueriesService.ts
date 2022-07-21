@@ -62,6 +62,7 @@ class QueriesService {
         .select([
           "queries.id",
           "queries.text",
+          "queries.created_at",
           "user.id",
           "user.user_name",
           "user.image",
@@ -146,6 +147,7 @@ class QueriesService {
       .select([
         "answers.id",
         "answers.text",
+        "answers.created_at",
         "user.id",
         "user.user_name",
         "user.image",
