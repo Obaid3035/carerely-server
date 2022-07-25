@@ -5,30 +5,27 @@ import Notification  from "../entities/Notification";
 @Service()
 class NotificationService {
 
-  async allViewed(currentUser: User) {
-    await Notification.createQueryBuilder("notification")
-      .update(Notification)
-      .set({
-        seen: true
-      })
-      .where({
-        receiver_id: currentUser.id
-      })
-      .execute()
-    return {
-      message: "notification updated successfully"
-    }
-  }
 
   async index(currentUser: User) {
     const notification = await Notification.createQueryBuilder("notification")
       .select(["notification", "sender.id", "sender.user_name", "sender.image", "receiver.id", "receiver.user_name", "receiver.image"])
       .where("notification.receiver_id = :receiver_id", {receiver_id: currentUser.id})
-      .andWhere("notification.seen IS FALSE")
       .innerJoin("notification.sender", "sender")
       .innerJoin("notification.receiver", "receiver")
       .orderBy("notification.created_at", "DESC")
       .getMany()
+
+    if (notification.length > 0) {
+      await Notification.createQueryBuilder("notification")
+        .update(Notification)
+        .set({
+          seen: true
+        })
+        .where({
+          receiver_id: currentUser.id
+        })
+        .execute()
+    }
 
     return notification;
 
@@ -61,15 +58,23 @@ class NotificationService {
   }
 
   async viewed(notificationId: number) {
-    await Notification.createQueryBuilder("notification")
-      .update(Notification)
-      .set({
-        seen: true
-      })
-      .where({
-        id: notificationId
-      })
-      .execute()
+    const notification = await Notification.findOne({
+      where: {
+        id: notificationId,
+        seen: false
+      }
+    })
+    if (notification) {
+      await Notification.createQueryBuilder("notification")
+        .update(Notification)
+        .set({
+          seen: true
+        })
+        .where({
+          id: notificationId
+        })
+        .execute()
+    }
     return {
       message: "notification updated successfully"
     }
