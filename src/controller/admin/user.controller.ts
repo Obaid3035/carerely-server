@@ -23,9 +23,10 @@ class AdminUserController implements IController {
                            next: NextFunction) => {
     try {
       const userServiceInstance = Container.get(UserService);
+      const { search } = req.query;
       const pageNo = parseInt(<string>req.query.page);
       const size = parseInt(<string>req.query.size);
-     const users = await userServiceInstance.index(pageNo * size, size);
+     const users = await userServiceInstance.index(pageNo * size, size, search);
       res.status(200).json(users);
     } catch (e) {
       next(e);

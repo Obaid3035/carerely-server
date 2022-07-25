@@ -101,37 +101,37 @@ class UserService{
     };
   }
 
-  async getUserStats(otherUserId: number) {
+  async getUserStats(user_name: string) {
+    const user = await User.findOne({
+      where: {
+        user_name: user_name,
+      },
+      select: ["user_name", "image", "is_verified"],
+    });
+    if (!user) throw new BadRequest('user does not exist');
     const postCountPromise = Post.createQueryBuilder("posts")
-      .where("posts.user_id = :otherUserId", { otherUserId: otherUserId })
+      .where("posts.user_id = :otherUserId", { otherUserId: user.id })
       .getCount();
 
     const followersCountPromise = FriendShip.createQueryBuilder("friendship")
       .where("friendship.receiver_id = :receiverId", {
-        receiverId: otherUserId,
+        receiverId: user.id,
       })
       .getCount();
 
     const followingsCountPromise = FriendShip.createQueryBuilder("friendship")
-      .where("friendship.sender_id = :senderId", { senderId: otherUserId })
+      .where("friendship.sender_id = :senderId", { senderId: user.id })
       .getCount();
 
-    const otherUserPromise = User.findOne({
-      where: {
-        id: otherUserId,
-      },
-      select: ["user_name", "image", "is_verified"],
-    });
-    const [ postCount, followersCount, followingCount, otherUser] =
+    const [ postCount, followersCount, followingCount] =
       await Promise.all([
         postCountPromise,
         followersCountPromise,
         followingsCountPromise,
-        otherUserPromise,
       ]);
 
     return {
-      user: otherUser,
+      user,
       postCount: postCount,
       followingCount: followingCount,
       followersCount: followersCount,

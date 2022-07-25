@@ -5,6 +5,21 @@ import Notification  from "../entities/Notification";
 @Service()
 class NotificationService {
 
+  async allViewed(currentUser: User) {
+    await Notification.createQueryBuilder("notification")
+      .update(Notification)
+      .set({
+        seen: true
+      })
+      .where({
+        receiver_id: currentUser.id
+      })
+      .execute()
+    return {
+      message: "notification updated successfully"
+    }
+  }
+
   async index(currentUser: User) {
     const notification = await Notification.createQueryBuilder("notification")
       .select(["notification", "sender.id", "sender.user_name", "sender.image", "receiver.id", "receiver.user_name", "receiver.image"])

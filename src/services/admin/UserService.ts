@@ -3,17 +3,34 @@ import User from "../../entities/User";
 
 @Service()
 class UserService {
-  async index(skip: number, limit: number) {
-    const userPromise = User.createQueryBuilder("user")
+  async index(skip: number, limit: number, search: any ) {
+    let userPromise = User.createQueryBuilder("user")
       .where("user.role != :role", { role: "admin"})
       .select(["user.id", "user.user_name", "user.email", "user.is_verified"])
       .skip(skip)
       .take(limit)
       .getMany();
 
-    const userCountPromise = User.createQueryBuilder("user")
+    let userCountPromise = User.createQueryBuilder("user")
       .where("user.role != :role", { role: "admin"})
       .getCount()
+    console.log("LOG",search)
+    if(search && search.length > 0) {
+      console.log(search)
+      userPromise = User.createQueryBuilder("user")
+        .where("user.role != :role", { role: "admin"})
+        .andWhere('user_name ILIKE :searchTerm', {searchTerm: `%${search}%`})
+        .select(["user.id", "user.user_name", "user.email", "user.is_verified"])
+        .skip(skip)
+        .take(limit)
+        .getMany();
+
+      userCountPromise = User.createQueryBuilder("user")
+        .where("user.role != :role", { role: "admin"})
+        .andWhere('user_name ILIKE :searchTerm', {searchTerm: `%${search}%`})
+        .getCount()
+    }
+
 
     const [user, userCount] = await Promise.all([userPromise, userCountPromise]);
     const formattedUser = user.map((user) => {

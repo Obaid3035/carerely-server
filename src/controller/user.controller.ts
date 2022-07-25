@@ -175,9 +175,9 @@ class UserController implements IController {
 
   private getUserStats = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const otherUserId = req.params.id
+      const user_name = req.params.id
       const userServiceInstance = Container.get(UserService);
-      const users = await userServiceInstance.getUserStats(parseInt(otherUserId));
+      const users = await userServiceInstance.getUserStats(user_name);
       res.status(200).json(users)
     } catch (e) {
       next(e);

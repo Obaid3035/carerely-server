@@ -13,6 +13,7 @@ class NotificationController implements IController {
     this.router
       .get(`${this.path}`, auth(UserRole.USER), this.index)
       .get(`${this.path}/few`, auth(UserRole.USER), this.showFew)
+      .put(`${this.path}`, auth(UserRole.USER), this.allViewed)
       .put(`${this.path}/:id`, auth(UserRole.USER), this.viewed);
   }
 
@@ -37,6 +38,18 @@ class NotificationController implements IController {
       next(e);
     }
   };
+
+  private allViewed = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const currentUser = (req as IRequest).user
+      const notificationServiceInstance = Container.get(NotificationService);
+      const notification = await notificationServiceInstance.allViewed(currentUser)
+      res.status(200).json(notification);
+    } catch (e) {
+      next(e);
+    }
+  };
+
 
   private viewed = async (req: Request, res: Response, next: NextFunction) => {
     try {

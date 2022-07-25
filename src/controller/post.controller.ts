@@ -114,11 +114,11 @@ class PostController implements IController {
   private otherPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req as IRequest).user;
-      const otherUserId = req.params.id;
+      const otherUserName = req.params.id;
       const pageNo = parseInt(<string>req.query.page);
       const size = parseInt(<string>req.query.size);
       const postInstance = Container.get(PostService);
-      const posts = await postInstance.otherPost(user, otherUserId, size * pageNo, size);
+      const posts = await postInstance.otherPost(user, otherUserName, size * pageNo, size);
       res.status(StatusCodes.OK).json(posts);
     } catch (e) {
       next(e);

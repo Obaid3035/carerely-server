@@ -44,7 +44,6 @@ class BlogService {
     const recentBlogs = await Blog.createQueryBuilder("blog")
       .select(["blog.id", "blog.title", "blog.feature_image", "blog.created_at"])
       .orderBy("blog.created_at", "ASC")
-      .take(4)
       .getMany()
 
     return {

@@ -296,10 +296,17 @@ class PostService {
 
   async otherPost(
     currUser: User,
-    otherUserId: string,
+    user_name: string,
     skip: number,
     limit: number
   ) {
+
+    const user = await User.findOne({
+      where: {
+        user_name
+      }
+    })
+
     console.log(
       "************ Fetching post, followers/following, name of the other user ************"
     );
@@ -308,9 +315,10 @@ class PostService {
       "************ Checking if user and otherUser have a friendShip ************"
     );
 
+
     const friendShip = await FriendShip.createQueryBuilder("friendship")
       .where("friendship.receiver_id = :receiver_id", {
-        receiver_id: otherUserId,
+        receiver_id: user.id,
       }).andWhere("friendship.sender_id = :sender_id", {
         sender_id: currUser.id,
       }).getOne();
@@ -328,7 +336,7 @@ class PostService {
     );
     const postsPromise = Post.createQueryBuilder("post")
       .select(["post", "post_user.id", "post.like_count", "post_user.user_name",  "post_user.image", "post_user.is_verified"])
-      .where("post.user_id = :user_id", { user_id: otherUserId })
+      .where("post.user_id = :user_id", { user_id: user.id })
       .innerJoin("post.user", "post_user")
       .loadRelationCountAndMap("post.comment_count", "post.comment")
       .orderBy("post.created_at", "DESC")
@@ -337,7 +345,7 @@ class PostService {
       .getMany();
 
     const postCountPromise = Post.createQueryBuilder("post")
-      .where("post.user_id = :user_id", { user_id: otherUserId })
+      .where("post.user_id = :user_id", { user_id: user.id })
       .innerJoin("post.user", "post_user")
       .getCount()
 

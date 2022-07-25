@@ -3,9 +3,10 @@ import {
   BeforeInsert,
   Column,
   Entity,
-  OneToMany, OneToOne,
+  Index,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
-  Index
 } from "typeorm";
 import jwt from "jsonwebtoken";
 import FriendShip from "./FriendShip";
@@ -32,7 +33,7 @@ class User extends BaseEntity {
     const user: User = await User.findOne({
       where: {
         email,
-      }
+      },
     });
     if (!user) {
       throw new NotFound("Unable too login. Please registered yourself");
@@ -46,14 +47,14 @@ class User extends BaseEntity {
   }
 
   static async authorize(token: string) {
-    const decode = <any> jwt.verify(token, process.env.JWT_SECRET);
+    const decode = <any>jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({
       where: {
-        id: decode.user._id
-      }
+        id: decode.user._id,
+      },
     });
     if (!user) {
-      throw new UnAuthorized("Session expired")
+      throw new UnAuthorized("Session expired");
     }
   }
 
@@ -92,7 +93,7 @@ class User extends BaseEntity {
   is_verified: boolean;
 
   @Column("simple-json", {
-    nullable: true
+    nullable: true,
   })
   image: {
     avatar: string;
@@ -115,32 +116,31 @@ class User extends BaseEntity {
   comment: Comment;
 
   @OneToOne(() => Profile, (profile) => profile.user)
-  profile: Profile
+  profile: Profile;
 
   @OneToMany(() => Queries, (queries) => queries.user)
-  queries: Queries
+  queries: Queries;
 
   @OneToMany(() => Blog, (blog) => blog.user)
-  blog: Blog
+  blog: Blog;
 
   @OneToMany(() => Calorie, (calorie) => calorie.user)
-  calorie: Calorie
+  calorie: Calorie;
 
   generateToken() {
     const user = this;
-    delete user.password
+    delete user.password;
     return jwt.sign({ user }, process.env.JWT_SECRET);
   }
 
   @BeforeInsert()
   async userAlreadyExists() {
-    const user = await User.findOne({
-      where: {
-        email: this.email
-      }
-    });
+    const user = await User.createQueryBuilder("user")
+      .where("user.email = :email", { email: this.email })
+      .orWhere("user.user_name = :user_name", { user_name: this.user_name })
+      .getOne();
     if (user) {
-      throw new NotFound("Sorry this email is already in use");
+      throw new NotFound("Sorry this email or username is already in use");
     }
   }
 
