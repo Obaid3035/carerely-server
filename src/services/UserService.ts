@@ -106,7 +106,7 @@ class UserService{
       where: {
         user_name: user_name,
       },
-      select: ["user_name", "image", "is_verified"],
+      select: ["id", "user_name", "image", "is_verified"],
     });
     if (!user) throw new BadRequest('user does not exist');
     const postCountPromise = Post.createQueryBuilder("posts")
