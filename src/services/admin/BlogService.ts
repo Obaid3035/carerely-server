@@ -7,14 +7,26 @@ import { NotFound } from "../../utils/errorCode";
 @Service()
 class BlogService {
 
-  async index(skip: number, limit: number) {
-    const blogPromise = Blog.createQueryBuilder("blog")
+  async index(skip: number, limit: number, search: any) {
+    let blogPromise = Blog.createQueryBuilder("blog")
       .skip(skip)
       .take(limit)
       .getMany();
 
-    const blogCountPromise = Blog.createQueryBuilder("blog")
+    let blogCountPromise = Blog.createQueryBuilder("blog")
       .getCount()
+
+    if(search && search.length > 0) {
+      blogPromise = Blog.createQueryBuilder("blog")
+        .andWhere('title ILIKE :searchTerm', {searchTerm: `%${search}%`})
+        .skip(skip)
+        .take(limit)
+        .getMany();
+
+      blogCountPromise = Blog.createQueryBuilder("blog")
+        .andWhere('title ILIKE :searchTerm', {searchTerm: `%${search}%`})
+        .getCount()
+    }
 
     const [blog, blogCount] = await Promise.all([blogPromise, blogCountPromise]);
 
@@ -22,7 +34,7 @@ class BlogService {
       return Object.values(blog)
     });
     return {
-      blog: formattedBlog,
+      data: formattedBlog,
       count: blogCount
     }
   }

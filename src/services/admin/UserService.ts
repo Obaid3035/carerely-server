@@ -14,9 +14,8 @@ class UserService {
     let userCountPromise = User.createQueryBuilder("user")
       .where("user.role != :role", { role: "admin"})
       .getCount()
-    console.log("LOG",search)
+
     if(search && search.length > 0) {
-      console.log(search)
       userPromise = User.createQueryBuilder("user")
         .where("user.role != :role", { role: "admin"})
         .andWhere('user_name ILIKE :searchTerm', {searchTerm: `%${search}%`})

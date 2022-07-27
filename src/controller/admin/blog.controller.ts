@@ -24,10 +24,11 @@ class BlogController implements IController {
     next: NextFunction
   ) => {
     try {
+      const { search } = req.query;
       const pageNo = parseInt(<string>req.query.page);
       const size = parseInt(<string>req.query.size);
       const blogServiceInstance = Container.get(BlogService);
-      const blog = await blogServiceInstance.index(pageNo * size, size);
+      const blog = await blogServiceInstance.index(pageNo * size, size, search);
       res.status(200).json(blog);
     } catch (e) {
       next(e);

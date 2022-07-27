@@ -2,24 +2,52 @@ import { Service } from "typedi";
 // import BaseService from "./base.service";
 import FriendShip  from "../entities/FriendShip";
 import User from "../entities/User";
-import { NotFound } from "../utils/errorCode";
+import { BadRequest, NotFound } from "../utils/errorCode";
 import Notification, { NotificationStatus } from "../entities/Notification";
 
 @Service()
 class FriendShipService {
 
-  async getUserFollower(currUserId: number | string) {
+  async getUserFollower(user_name:  string) {
+    const user = await User.findOne({
+      where: {
+        user_name
+      }
+    })
+    if (!user) throw new BadRequest('User not found')
     return await FriendShip.createQueryBuilder("friendShip")
       .select(["friendShip", "user.user_name"])
-      .where("friendShip.receiver_id = :receiver_id", { receiver_id: currUserId })
+      .where("friendShip.receiver_id = :receiver_id", { receiver_id: user.id })
       .innerJoin("friendShip.sender", "user")
       .getMany();
   }
 
-  async getUserFollowing(currUserId: number | string) {
+  async getCurrentUserFollower(id:  number) {
     return await FriendShip.createQueryBuilder("friendShip")
       .select(["friendShip", "user.user_name"])
-      .where("friendShip.sender_id = :sender_id", { sender_id: currUserId })
+      .where("friendShip.receiver_id = :receiver_id", { receiver_id: id })
+      .innerJoin("friendShip.sender", "user")
+      .getMany();
+  }
+
+  async getUserFollowing(user_name:  string) {
+    const user = await User.findOne({
+      where: {
+        user_name
+      }
+    })
+    if (!user) throw new BadRequest('User not found')
+    return await FriendShip.createQueryBuilder("friendShip")
+      .select(["friendShip", "user.user_name"])
+      .where("friendShip.sender_id = :sender_id", { sender_id: user.id })
+      .innerJoin("friendShip.receiver", "user")
+      .getMany();
+  }
+
+  async getCurrentUserFollowing(id:  number) {
+    return await FriendShip.createQueryBuilder("friendShip")
+      .select(["friendShip", "user.user_name"])
+      .where("friendShip.sender_id = :sender_id", { sender_id: id })
       .innerJoin("friendShip.receiver", "user")
       .getMany();
   }
@@ -39,17 +67,15 @@ class FriendShipService {
     }
   }
 
-  async sendFriendShipRequest(sender: User, receiverId: number) {
+  async sendFriendShipRequest(sender: User, user_name: string) {
     console.log("*********** Creating FriendShip *************");
 
     const receiver: User = await User.findOne({
       where: {
-        id: receiverId
+        user_name
       }
     });
-    if (!receiver) {
-      throw new NotFound("User not found");
-    }
+    if (!receiver) throw new NotFound("User not found");
     const friendShip = FriendShip.create({
       sender: sender,
       receiver: receiver,
@@ -64,13 +90,19 @@ class FriendShipService {
     };
   }
 
-  async deleteFriendShip(userId_1: string, currUserId: User) {
+  async deleteFriendShip(user_name: string, currUserId: User) {
+    const user = await User.findOne({
+      where: {
+        user_name
+      }
+    })
+    if (!user) throw new BadRequest('Something went wrong')
     console.log(
       "************** Checking if user 1 is the sender and user 2 is receiver *************"
     );
     const friendShip_1 = await FriendShip.createQueryBuilder("friendship")
       .where("friendship.receiver_id = :receiver_id", {
-        receiver_id: userId_1,
+        receiver_id: user.id,
       }).andWhere("friendship.sender_id = :sender_id", {
         sender_id: currUserId.id,
       }).getOne();

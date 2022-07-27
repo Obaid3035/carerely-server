@@ -13,13 +13,13 @@ class FriendShipController implements IController {
 
   constructor() {
     this.router
-      .post(`${this.path}/sent/:receiverId`, auth(UserRole.USER), this.sendFriendShipRequest)
+      .post(`${this.path}/sent/:id`, auth(UserRole.USER), this.sendFriendShipRequest)
       .get(`${this.path}/followings`, auth(UserRole.USER), this.getCurrentUserFollowing)
       .get(`${this.path}/followers`, auth(UserRole.USER), this.getCurrentUserFollower)
       .get(`${this.path}/followings/:id`, auth(UserRole.USER), this.getOtherUserFollowing)
       .get(`${this.path}/followers/:id`, auth(UserRole.USER), this.getOtherUserFollower)
       .delete(`${this.path}/:id`, auth(UserRole.USER), this.unFollowFriendship)
-      .delete(`${this.path}/delete-friendship/:userId`, auth(UserRole.USER), this.deleteFriendShip);
+      .delete(`${this.path}/delete-friendship/:id`, auth(UserRole.USER), this.deleteFriendShip);
   }
 
 
@@ -78,7 +78,7 @@ class FriendShipController implements IController {
     try {
       const currUser: User = (<IRequest>req).user;
       const friendShipInstance = Container.get(FriendShipService);
-      const followingUser = await friendShipInstance.getUserFollower(currUser.id)
+      const followingUser = await friendShipInstance.getCurrentUserFollower(currUser.id)
       res.status(200).json(followingUser)
     } catch (e) {
       next(e);
@@ -93,7 +93,7 @@ class FriendShipController implements IController {
     try {
       const currUser: User = (<IRequest>req).user;
       const friendShipInstance = Container.get(FriendShipService);
-      const followingUser = await friendShipInstance.getUserFollowing(currUser.id)
+      const followingUser = await friendShipInstance.getCurrentUserFollowing(currUser.id)
       res.status(200).json(followingUser)
     } catch (e) {
       next(e);
@@ -106,12 +106,12 @@ class FriendShipController implements IController {
     next: NextFunction
   ) => {
     try {
-      const { receiverId } = req.params;
+      const { id } = req.params;
       const sender: User = (<IRequest>req).user;
       const friendShipInstance = Container.get(FriendShipService);
       const friendShip = await friendShipInstance.sendFriendShipRequest(
         sender,
-        parseInt(receiverId)
+        id
       );
       res.status(StatusCodes.CREATED).json(friendShip);
     } catch (e) {
@@ -125,12 +125,12 @@ class FriendShipController implements IController {
     next: NextFunction
   ) => {
     try {
-      const { userId } = req.params;
+      const { id } = req.params;
       const user_2: User = (<IRequest>req).user;
       const friendShipInstance = Container.get(FriendShipService);
 
       const friendShip = await friendShipInstance.deleteFriendShip(
-          userId,
+        id,
         user_2
       );
       res.status(200).json(friendShip);

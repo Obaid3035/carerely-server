@@ -10,7 +10,9 @@ class BlogService {
         is_featured: true
       }
     });
-    const nonFeaturedBlogPromise = Blog.find();
+    const nonFeaturedBlogPromise = Blog.createQueryBuilder("blog")
+      .orderBy("blog.created_at", "ASC")
+      .getMany();
     const [featuredBlog, nonFeaturedBlog] = await Promise.all([
       featuredBlogPromise, nonFeaturedBlogPromise])
 
