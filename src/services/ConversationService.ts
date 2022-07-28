@@ -2,7 +2,7 @@ import { Service } from "typedi";
 import Conversation from "../entities/Conversation";
 import User from "../entities/User";
 import { Brackets } from "typeorm";
-import { NotFound } from "../utils/errorCode";
+import { BadRequest, NotFound } from "../utils/errorCode";
 
 @Service()
 class ConversationService {
@@ -70,10 +70,16 @@ class ConversationService {
     return conversation;
   }
 
-  async create(currUser: User, otherUserId: number) {
+  async create(currUser: User, otherUserName: string) {
+    const user = await User.findOne({
+      where: {
+        user_name: otherUserName
+      }
+    })
+    if (!user) throw new BadRequest('user not found')
     const receiver: User = await User.findOne({
       where: {
-        id: otherUserId
+        id: user.id
       }
     });
 

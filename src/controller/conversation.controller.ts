@@ -53,9 +53,9 @@ class ConversationController implements IController {
   ) => {
     try {
       const user = (req as IRequest).user;
-      const otherUserId = req.params.id
+      const otherUserName = req.params.id
       const conversationInstance = Container.get(ConversationService);
-      const conversation = await conversationInstance.create(user, parseInt(otherUserId));
+      const conversation = await conversationInstance.create(user, otherUserName);
       res.status(200).json(conversation)
     } catch (e) {
       next(e);
